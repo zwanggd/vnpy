@@ -1,0 +1,657 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2024-03-21 16:21+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: vnpy\trader\constant.py:14
+msgid "多"
+msgstr "多"
+
+#: vnpy\trader\constant.py:15
+msgid "空"
+msgstr "空"
+
+#: vnpy\trader\constant.py:16
+msgid "净"
+msgstr "淨"
+
+#: vnpy\trader\constant.py:24
+msgid "开"
+msgstr "開"
+
+#: vnpy\trader\constant.py:25
+msgid "平"
+msgstr "平"
+
+#: vnpy\trader\constant.py:26
+msgid "平今"
+msgstr "平今倉 (當日)"
+
+#: vnpy\trader\constant.py:27
+msgid "平昨"
+msgstr "平留倉 (歷史)"
+
+#: vnpy\trader\constant.py:34
+msgid "提交中"
+msgstr "提交中"
+
+#: vnpy\trader\constant.py:35
+msgid "未成交"
+msgstr "未成交"
+
+#: vnpy\trader\constant.py:36
+msgid "部分成交"
+msgstr "部分成交"
+
+#: vnpy\trader\constant.py:37
+msgid "全部成交"
+msgstr "全部成交"
+
+#: vnpy\trader\constant.py:38
+msgid "已撤销"
+msgstr "已取消"
+
+#: vnpy\trader\constant.py:39
+msgid "拒单"
+msgstr "退單"
+
+#: vnpy\trader\constant.py:46
+msgid "股票"
+msgstr "股票"
+
+#: vnpy\trader\constant.py:47
+msgid "期货"
+msgstr "期貨"
+
+#: vnpy\trader\constant.py:48
+msgid "期权"
+msgstr "選擇權"
+
+#: vnpy\trader\constant.py:49
+msgid "指数"
+msgstr "指數"
+
+#: vnpy\trader\constant.py:50
+msgid "外汇"
+msgstr "外匯"
+
+#: vnpy\trader\constant.py:51
+msgid "现货"
+msgstr "現貨"
+
+#: vnpy\trader\constant.py:53
+msgid "债券"
+msgstr "債券"
+
+#: vnpy\trader\constant.py:54
+msgid "权证"
+msgstr "權證"
+
+#: vnpy\trader\constant.py:55
+msgid "价差"
+msgstr "價差"
+
+#: vnpy\trader\constant.py:56
+msgid "基金"
+msgstr "基金"
+
+#: vnpy\trader\constant.py:58
+msgid "互换"
+msgstr "交換"
+
+#: vnpy\trader\constant.py:65
+msgid "限价"
+msgstr "限價"
+
+#: vnpy\trader\constant.py:66
+msgid "市价"
+msgstr "市價"
+
+#: vnpy\trader\constant.py:70
+msgid "询价"
+msgstr "詢價"
+
+#: vnpy\trader\constant.py:77
+msgid "看涨期权"
+msgstr "買權"
+
+#: vnpy\trader\constant.py:78
+msgid "看跌期权"
+msgstr "賣權"
+
+#: vnpy\trader\database.py:155
+msgid "找不到数据库驱动{}，使用默认的SQLite数据库"
+msgstr "找不到資料庫驅動{}，使用預設的SQLite資料庫"
+
+#: vnpy\trader\datafeed.py:26
+msgid "查询K线数据失败：没有正确配置数据服务"
+msgstr "查詢K線資料失敗：沒有正確設定資料服務"
+
+#: vnpy\trader\datafeed.py:32
+msgid "查询Tick数据失败：没有正确配置数据服务"
+msgstr "查詢Tick資料失敗：沒有正確設定資料服務"
+
+#: vnpy\trader\datafeed.py:51
+msgid "没有配置要使用的数据服务，请修改全局配置中的datafeed相关内容"
+msgstr "沒有設定要使用的資料服務，請修改全域設定中的datafeed相關內容"
+
+#: vnpy\trader\datafeed.py:65
+msgid "无法加载数据服务模块，请运行 pip install {} 尝试安装"
+msgstr "無法載入資料服務模組，請執行 pip install {} 嘗試安裝"
+
+#: vnpy\trader\engine.py:128
+msgid "找不到底层接口：{}"
+msgstr "找不到底層介面：{}"
+
+#: vnpy\trader\engine.py:137
+msgid "找不到引擎：{}"
+msgstr "找不到引擎：{}"
+
+#: vnpy\trader\engine.py:219
+msgid "连接登录：{}"
+msgstr "連線登入：{}"
+
+#: vnpy\trader\engine.py:229
+msgid "订阅行情 -> {}：{}"
+msgstr "訂閱行情 -> {}: {}"
+
+#: vnpy\trader\engine.py:239
+msgid "委托下单 -> {}：{}"
+msgstr "委託下單 -> {}: {}"
+
+#: vnpy\trader\engine.py:251
+msgid "委托撤单 -> {}：{}"
+msgstr "委託刪單 -> {}: {}"
+
+#: vnpy\trader\engine.py:261
+msgid "报价下单 -> {}：{}"
+msgstr "報價下單 -> {}: {}"
+
+#: vnpy\trader\engine.py:273
+msgid "报价撤单 -> {}：{}"
+msgstr "報價刪單 -> {}: {}"
+
+#: vnpy\trader\engine.py:283
+msgid "查询K线 -> {}：{}"
+msgstr "查詢K線 -> {}: {}"
+
+#: vnpy\trader\engine.py:663
+msgid "邮件发送失败: {}"
+msgstr "電子郵件發送失敗: {}"
+
+#: vnpy\trader\optimize.py:45
+msgid "固定参数添加成功"
+msgstr "固定參數新增成功"
+
+#: vnpy\trader\optimize.py:48
+msgid "参数优化起始点必须小于终止点"
+msgstr "參數最佳化起始點必須小於終止點"
+
+#: vnpy\trader\optimize.py:51
+msgid "参数优化步进必须大于0"
+msgstr "參數最佳化步長必須大於0"
+
+#: vnpy\trader\optimize.py:62
+msgid "范围参数添加成功，数量{}"
+msgstr "範圍參數新增成功，數量{}"
+
+#: vnpy\trader\optimize.py:88
+msgid "优化参数组合为空，请检查"
+msgstr "最佳化參數組合為空，請檢查"
+
+#: vnpy\trader\optimize.py:92
+msgid "优化目标未设置，请检查"
+msgstr "最佳化目標未設定，請檢查"
+
+#: vnpy\trader\optimize.py:108
+msgid "开始执行穷举算法优化"
+msgstr "開始執行窮舉演算法最佳化"
+
+#: vnpy\trader\optimize.py:109 vnpy\trader\optimize.py:193
+msgid "参数优化空间：{}"
+msgstr "參數最佳化空間：{}"
+
+#: vnpy\trader\optimize.py:126
+msgid "穷举算法优化完成，耗时{}秒"
+msgstr "窮舉演算法最佳化完成，耗時{}秒"
+
+#: vnpy\trader\optimize.py:192
+msgid "开始执行遗传算法优化"
+msgstr "開始執行遺傳演算法最佳化"
+
+#: vnpy\trader\optimize.py:194
+msgid "每代族群总数：{}"
+msgstr "每代族群大小：{}"
+
+#: vnpy\trader\optimize.py:195
+msgid "优良筛选个数：{}"
+msgstr "優良篩選個數：{}"
+
+#: vnpy\trader\optimize.py:196
+msgid "迭代次数：{}"
+msgstr "疊代次數：{}"
+
+#: vnpy\trader\optimize.py:197
+msgid "交叉概率：{:.0%}"
+msgstr "交叉機率：{:.0%}"
+
+#: vnpy\trader\optimize.py:198
+msgid "突变概率：{:.0%}"
+msgstr "突變機率：{:.0%}"
+
+#: vnpy\trader\optimize.py:216
+msgid "遗传算法优化完成，耗时{}秒"
+msgstr "遺傳演算法最佳化完成，耗時{}秒"
+
+#: vnpy\trader\ui\mainwindow.py:47
+msgid "VeighNa Trader 社区版 - {}   [{}]"
+msgstr "VeighNa Trader 社群版 - {}  [{}]"
+
+#: vnpy\trader\ui\mainwindow.py:65
+msgid "交易"
+msgstr "交易"
+
+#: vnpy\trader\ui\mainwindow.py:68
+msgid "行情"
+msgstr "行情"
+
+#: vnpy\trader\ui\mainwindow.py:71 vnpy\trader\ui\widget.py:734
+msgid "委托"
+msgstr "委託"
+
+#: vnpy\trader\ui\mainwindow.py:74
+msgid "活动"
+msgstr "有效委託"
+
+#: vnpy\trader\ui\mainwindow.py:77
+msgid "成交"
+msgstr "成交"
+
+#: vnpy\trader\ui\mainwindow.py:80
+msgid "日志"
+msgstr "日誌"
+
+#: vnpy\trader\ui\mainwindow.py:83
+msgid "资金"
+msgstr "資金"
+
+#: vnpy\trader\ui\mainwindow.py:86
+msgid "持仓"
+msgstr "部位"
+
+#: vnpy\trader\ui\mainwindow.py:102
+msgid "系统"
+msgstr "系統"
+
+#: vnpy\trader\ui\mainwindow.py:109 vnpy\trader\ui\widget.py:605
+msgid "连接{}"
+msgstr "連線{}"
+
+#: vnpy\trader\ui\mainwindow.py:118 vnpy\trader\ui\mainwindow.py:250
+msgid "退出"
+msgstr "離開"
+
+#: vnpy\trader\ui\mainwindow.py:124
+msgid "功能"
+msgstr "功能"
+
+#: vnpy\trader\ui\mainwindow.py:136
+msgid "配置"
+msgstr "設定"
+
+#: vnpy\trader\ui\mainwindow.py:141
+msgid "帮助"
+msgstr "說明"
+
+#: vnpy\trader\ui\mainwindow.py:145
+msgid "查询合约"
+msgstr "查詢合約"
+
+#: vnpy\trader\ui\mainwindow.py:153
+msgid "还原窗口"
+msgstr "還原視窗"
+
+#: vnpy\trader\ui\mainwindow.py:160
+msgid "测试邮件"
+msgstr "測試電子郵件"
+
+#: vnpy\trader\ui\mainwindow.py:167
+msgid "社区论坛"
+msgstr "社群論壇"
+
+#: vnpy\trader\ui\mainwindow.py:175
+msgid "关于"
+msgstr "關於"
+
+#: vnpy\trader\ui\mainwindow.py:183
+msgid "工具栏"
+msgstr "工具列"
+
+#: vnpy\trader\ui\mainwindow.py:251
+msgid "确认退出？"
+msgstr "確認要離開嗎？"
+
+#: vnpy\trader\ui\qt.py:87
+msgid "触发异常"
+msgstr "發生錯誤"
+
+#: vnpy\trader\ui\qt.py:93
+msgid "复制"
+msgstr "複製"
+
+#: vnpy\trader\ui\qt.py:96
+msgid "求助"
+msgstr "取得協助"
+
+#: vnpy\trader\ui\qt.py:99
+msgid "关闭"
+msgstr "關閉"
+
+#: vnpy\trader\ui\widget.py:265
+msgid "调整列宽"
+msgstr "調整欄寬"
+
+#: vnpy\trader\ui\widget.py:269 vnpy\trader\ui\widget.py:349
+msgid "保存数据"
+msgstr "儲存資料"
+
+#: vnpy\trader\ui\widget.py:404 vnpy\trader\ui\widget.py:449
+#: vnpy\trader\ui\widget.py:472 vnpy\trader\ui\widget.py:513
+#: vnpy\trader\ui\widget.py:555 vnpy\trader\ui\widget.py:742
+#: vnpy\trader\ui\widget.py:1062
+msgid "代码"
+msgstr "代碼"
+
+#: vnpy\trader\ui\widget.py:405 vnpy\trader\ui\widget.py:450
+#: vnpy\trader\ui\widget.py:473 vnpy\trader\ui\widget.py:514
+#: vnpy\trader\ui\widget.py:556 vnpy\trader\ui\widget.py:741
+#: vnpy\trader\ui\widget.py:1063
+msgid "交易所"
+msgstr "交易所"
+
+#: vnpy\trader\ui\widget.py:406 vnpy\trader\ui\widget.py:743
+#: vnpy\trader\ui\widget.py:1064
+msgid "名称"
+msgstr "名稱"
+
+#: vnpy\trader\ui\widget.py:407
+msgid "最新价"
+msgstr "最新價"
+
+#: vnpy\trader\ui\widget.py:408
+msgid "成交量"
+msgstr "成交量"
+
+#: vnpy\trader\ui\widget.py:409
+msgid "开盘价"
+msgstr "開盤價"
+
+#: vnpy\trader\ui\widget.py:410
+msgid "最高价"
+msgstr "最高價"
+
+#: vnpy\trader\ui\widget.py:411
+msgid "最低价"
+msgstr "最低價"
+
+#: vnpy\trader\ui\widget.py:412
+msgid "买1价"
+msgstr "委買價1"
+
+#: vnpy\trader\ui\widget.py:413
+msgid "买1量"
+msgstr "委買量1"
+
+#: vnpy\trader\ui\widget.py:414
+msgid "卖1价"
+msgstr "委賣價1"
+
+#: vnpy\trader\ui\widget.py:415
+msgid "卖1量"
+msgstr "委賣量1"
+
+#: vnpy\trader\ui\widget.py:416 vnpy\trader\ui\widget.py:431
+#: vnpy\trader\ui\widget.py:455 vnpy\trader\ui\widget.py:481
+#: vnpy\trader\ui\widget.py:564
+msgid "时间"
+msgstr "時間"
+
+#: vnpy\trader\ui\widget.py:417 vnpy\trader\ui\widget.py:433
+#: vnpy\trader\ui\widget.py:456 vnpy\trader\ui\widget.py:482
+#: vnpy\trader\ui\widget.py:521 vnpy\trader\ui\widget.py:539
+#: vnpy\trader\ui\widget.py:565 vnpy\trader\ui\widget.py:749
+msgid "接口"
+msgstr "介面"
+
+#: vnpy\trader\ui\widget.py:432
+msgid "訊息"
+msgstr "Message"
+
+#: vnpy\trader\ui\widget.py:447
+msgid "成交号"
+msgstr "成交序號"
+
+#: vnpy\trader\ui\widget.py:448 vnpy\trader\ui\widget.py:470
+msgid "委托号"
+msgstr "委託序號"
+
+#: vnpy\trader\ui\widget.py:451 vnpy\trader\ui\widget.py:475
+#: vnpy\trader\ui\widget.py:515 vnpy\trader\ui\widget.py:744
+msgid "方向"
+msgstr "方向"
+
+#: vnpy\trader\ui\widget.py:452 vnpy\trader\ui\widget.py:476
+#: vnpy\trader\ui\widget.py:745
+msgid "开平"
+msgstr "開平"
+
+#: vnpy\trader\ui\widget.py:453 vnpy\trader\ui\widget.py:477
+#: vnpy\trader\ui\widget.py:747
+msgid "价格"
+msgstr "價格"
+
+#: vnpy\trader\ui\widget.py:454 vnpy\trader\ui\widget.py:516
+#: vnpy\trader\ui\widget.py:748
+msgid "数量"
+msgstr "數量"
+
+#: vnpy\trader\ui\widget.py:471 vnpy\trader\ui\widget.py:554
+msgid "来源"
+msgstr "來源"
+
+#: vnpy\trader\ui\widget.py:474 vnpy\trader\ui\widget.py:746
+msgid "类型"
+msgstr "類型"
+
+#: vnpy\trader\ui\widget.py:478
+msgid "总数量"
+msgstr "總數量"
+
+#: vnpy\trader\ui\widget.py:479
+msgid "已成交"
+msgstr "已成交"
+
+#: vnpy\trader\ui\widget.py:480 vnpy\trader\ui\widget.py:563
+msgid "状态"
+msgstr "狀態"
+
+#: vnpy\trader\ui\widget.py:491
+msgid "双击单元格撤单"
+msgstr "雙擊儲存格刪單"
+
+#: vnpy\trader\ui\widget.py:517
+msgid "昨仓"
+msgstr "留倉部位"
+
+#: vnpy\trader\ui\widget.py:518 vnpy\trader\ui\widget.py:537
+msgid "冻结"
+msgstr "凍結"
+
+#: vnpy\trader\ui\widget.py:519
+msgid "均价"
+msgstr "均價"
+
+#: vnpy\trader\ui\widget.py:520
+msgid "盈亏"
+msgstr "損益"
+
+#: vnpy\trader\ui\widget.py:535
+msgid "账号"
+msgstr "帳號"
+
+#: vnpy\trader\ui\widget.py:536
+msgid "余额"
+msgstr "餘額"
+
+#: vnpy\trader\ui\widget.py:538
+msgid "可用"
+msgstr "可用"
+
+#: vnpy\trader\ui\widget.py:553
+msgid "报价号"
+msgstr "報價序號"
+
+#: vnpy\trader\ui\widget.py:557
+msgid "买开平"
+msgstr "買開平"
+
+#: vnpy\trader\ui\widget.py:558
+msgid "买量"
+msgstr "委買量"
+
+#: vnpy\trader\ui\widget.py:559
+msgid "买价"
+msgstr "委買價"
+
+#: vnpy\trader\ui\widget.py:560
+msgid "卖价"
+msgstr "委賣價"
+
+#: vnpy\trader\ui\widget.py:561
+msgid "卖量"
+msgstr "委賣量"
+
+#: vnpy\trader\ui\widget.py:562
+msgid "卖开平"
+msgstr "賣開平"
+
+#: vnpy\trader\ui\widget.py:574
+msgid "双击单元格撤销报价"
+msgstr "雙擊儲存格取消報價"
+
+#: vnpy\trader\ui\widget.py:635
+msgid "密码"
+msgstr "密碼"
+
+#: vnpy\trader\ui\widget.py:645
+msgid "连接"
+msgstr "連線"
+
+#: vnpy\trader\ui\widget.py:732
+msgid "设置价格随行情更新"
+msgstr "設定價格隨行情跳動"
+
+#: vnpy\trader\ui\widget.py:737
+msgid "全撤"
+msgstr "全部刪單"
+
+#: vnpy\trader\ui\widget.py:964
+msgid "请输入合约代码"
+msgstr "請輸入合約代號"
+
+#: vnpy\trader\ui\widget.py:964 vnpy\trader\ui\widget.py:969
+msgid "委托失败"
+msgstr "委託失敗"
+
+#: vnpy\trader\ui\widget.py:969
+msgid "请输入委托数量"
+msgstr "請輸入委託數量"
+
+#: vnpy\trader\ui\widget.py:1061
+msgid "本地代码"
+msgstr "本地代號"
+
+#: vnpy\trader\ui\widget.py:1065
+msgid "合约分类"
+msgstr "合約分類"
+
+#: vnpy\trader\ui\widget.py:1066
+msgid "合约乘数"
+msgstr "合約乘數"
+
+#: vnpy\trader\ui\widget.py:1067
+msgid "价格跳动"
+msgstr "最小跳動值"
+
+#: vnpy\trader\ui\widget.py:1068
+msgid "最小委托量"
+msgstr "最小委託量"
+
+#: vnpy\trader\ui\widget.py:1069
+msgid "期权产品"
+msgstr "選擇權商品"
+
+#: vnpy\trader\ui\widget.py:1070
+msgid "期权到期日"
+msgstr "選擇權到期日"
+
+#: vnpy\trader\ui\widget.py:1071
+msgid "期权行权价"
+msgstr "選擇權履約價"
+
+#: vnpy\trader\ui\widget.py:1072
+msgid "期权类型"
+msgstr "選擇權類型"
+
+#: vnpy\trader\ui\widget.py:1073
+msgid "交易接口"
+msgstr "交易介面"
+
+#: vnpy\trader\ui\widget.py:1086
+msgid "合约查询"
+msgstr "合約查詢"
+
+#: vnpy\trader\ui\widget.py:1090
+msgid "输入合约代码或者交易所，留空则查询所有合约"
+msgstr "輸入合約代號或者交易所，留空則查詢所有合約"
+
+#: vnpy\trader\ui\widget.py:1092
+msgid "查询"
+msgstr "查詢"
+
+#: vnpy\trader\ui\widget.py:1168
+msgid "关于VeighNa Trader"
+msgstr "關於VeighNa Trader"
+
+#: vnpy\trader\ui\widget.py:1214
+msgid "全局配置"
+msgstr "全域設定"
+
+#: vnpy\trader\ui\widget.py:1230
+msgid "确定"
+msgstr "確定"
+
+#: vnpy\trader\ui\widget.py:1266
+msgid "注意"
+msgstr "注意"
+
+#: vnpy\trader\ui\widget.py:1267
+msgid "全局配置的修改需要重启后才会生效！"
+msgstr "全域設定的修改需要重新啟動後才會生效！"
+
+#: vnpy\trader\utility.py:209
+msgid "合成日K线必须传入每日收盘时间"
+msgstr "合成日K線必須傳入每日收盤時間"
+
