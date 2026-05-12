@@ -1,0 +1,317 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import uuid
+from dataclasses import asdict, is_dataclass
+from datetime import datetime
+from enum import Enum
+from typing import Any
+
+from myQuant.news_ingestion.contracts import (
+    AgentSignal,
+    ImpactDirection,
+    LLMOutputRecord,
+    LLMRunRecord,
+    RawNewsItem,
+    RelationType,
+    Status,
+    TimeHorizon,
+)
+from myQuant.news_ingestion.recall.engine import MappedNews
+
+
+REPAIR_PROMPT = "The previous response was not valid JSON. Please respond with valid JSON only."
+RETRYABLE_HTTP_STATUS = {429, 500, 502, 503}
+REQUIRED_FIELDS = (
+    "event",
+    "relation_type",
+    "impact_direction",
+    "impact_strength",
+    "time_horizon",
+    "confidence",
+    "reason",
+    "evidence",
+)
+
+
+class DeepSeekNewsEvaluator:
+    def __init__(
+        self,
+        client: Any | None = None,
+        model: str = "deepseek-v4-flash",
+        temperature: float = 0.0,
+        max_tokens: int = 1024,
+        prompt_version: str = "news_impact_v1",
+        schema_version: str = "agent_signal_v1",
+    ) -> None:
+        self.client = client or self._default_client()
+        self.model = model
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.prompt_version = prompt_version
+        self.schema_version = schema_version
+        self.attempt_records: list[tuple[LLMRunRecord, LLMOutputRecord]] = []
+
+    @staticmethod
+    def _default_client() -> Any:
+        from openai import OpenAI
+
+        return OpenAI(
+            api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
+            base_url="https://api.deepseek.com",
+        )
+
+    def evaluate(
+        self,
+        mapped_news: MappedNews,
+        news_item: RawNewsItem,
+    ) -> tuple[LLMRunRecord, LLMOutputRecord, AgentSignal | None]:
+        self.attempt_records = []
+        prompt = self._build_prompt(mapped_news, news_item)
+        messages = [{"role": "user", "content": prompt}]
+        input_hash = self._hash_text(prompt)
+        http_attempts = 0
+        repaired_invalid_json = False
+
+        while True:
+            http_attempts += 1
+            started_at = datetime.now()
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                    response_format={"type": "json_object"},
+                    extra_body={"thinking": {"type": "disabled"}},
+                )
+                raw_response = self._extract_content(response)
+                token_usage = self._extract_usage(response)
+                parsed_json, errors = self._parse_and_validate(raw_response)
+                if errors and not repaired_invalid_json:
+                    run, output = self._make_records(
+                        mapped_news=mapped_news,
+                        input_hash=input_hash,
+                        raw_response=raw_response,
+                        parsed_json=parsed_json,
+                        validation_errors=errors,
+                        token_usage=token_usage,
+                        started_at=started_at,
+                        status=Status.FAILED,
+                    )
+                    self.attempt_records.append((run, output))
+                    messages.append({"role": "assistant", "content": raw_response})
+                    messages.append({"role": "user", "content": REPAIR_PROMPT})
+                    repaired_invalid_json = True
+                    continue
+
+                status = Status.FAILED if errors else Status.SUCCESS
+                run, output = self._make_records(
+                    mapped_news=mapped_news,
+                    input_hash=input_hash,
+                    raw_response=raw_response,
+                    parsed_json=parsed_json,
+                    validation_errors=errors,
+                    token_usage=token_usage,
+                    started_at=started_at,
+                    status=status,
+                )
+                self.attempt_records.append((run, output))
+                if errors:
+                    return run, output, None
+                return run, output, self._make_signal(mapped_news, news_item, parsed_json)
+            except Exception as exc:
+                status_code = self._http_status_code(exc)
+                retryable = status_code in RETRYABLE_HTTP_STATUS and http_attempts <= 3
+                run, output = self._make_records(
+                    mapped_news=mapped_news,
+                    input_hash=input_hash,
+                    raw_response="",
+                    parsed_json={},
+                    validation_errors=(f"HTTP error {status_code}: {exc}",),
+                    token_usage={},
+                    started_at=started_at,
+                    status=Status.FAILED,
+                    error=f"HTTP error {status_code}: {exc}",
+                )
+                self.attempt_records.append((run, output))
+                if retryable:
+                    continue
+                return run, output, None
+
+    def _build_prompt(self, mapped_news: MappedNews, news_item: RawNewsItem) -> str:
+        return "\n".join(
+            (
+                "你是A股新闻影响评估助手。请只输出合法JSON，不要输出Markdown。",
+                "任务：分析新闻对指定股票的影响，字段名必须使用英文。",
+                f"新闻标题：{news_item.title}",
+                f"新闻内容：{news_item.content}",
+                f"股票vt_symbol：{mapped_news.vt_symbol}",
+                f"股票代码：{mapped_news.symbol}",
+                f"交易所：{mapped_news.exchange}",
+                "股票名称：未知",
+                "行业：未知",
+                "产品：未知",
+                "上游/下游：未知",
+                f"召回关系提示：{mapped_news.relation_hint.value}",
+                "输出JSON字段：event, relation_type, impact_direction, impact_strength, time_horizon, confidence, reason, evidence。",
+                "relation_type只能是direct_company|supply_chain|industry|macro_policy|market_sentiment|risk_event|unknown。",
+                "impact_direction只能是positive|negative|neutral|mixed|unknown。",
+                "time_horizon只能是intraday|short|medium|long|unknown。",
+                "impact_strength和confidence必须是0.0到1.0之间的数字。reason用简短中文解释，evidence填写新闻中的关键句。",
+            )
+        )
+
+    def _make_records(
+        self,
+        mapped_news: MappedNews,
+        input_hash: str,
+        raw_response: str,
+        parsed_json: dict[str, Any],
+        validation_errors: tuple[str, ...],
+        token_usage: dict[str, Any],
+        started_at: datetime,
+        status: Status,
+        error: str = "",
+    ) -> tuple[LLMRunRecord, LLMOutputRecord]:
+        run_id = f"deepseek-{uuid.uuid4().hex}"
+        finished_at = datetime.now()
+        run = LLMRunRecord(
+            run_id=run_id,
+            raw_news_id=mapped_news.raw_news_id,
+            provider="deepseek",
+            model=self.model,
+            prompt_version=self.prompt_version,
+            schema_version=self.schema_version,
+            parameters={
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+                "response_format": {"type": "json_object"},
+                "extra_body": {"thinking": {"type": "disabled"}},
+            },
+            input_hash=input_hash,
+            status=status,
+            started_at=started_at,
+            finished_at=finished_at,
+            error=error,
+        )
+        output = LLMOutputRecord(
+            llm_run_id=0,
+            raw_response=raw_response,
+            parsed_json=parsed_json,
+            validation_status=Status.SUCCESS if status is Status.SUCCESS else Status.FAILED,
+            validation_errors=validation_errors,
+            output_hash=self._hash_text(raw_response),
+            token_usage=token_usage,
+        )
+        return run, output
+
+    def _make_signal(
+        self,
+        mapped_news: MappedNews,
+        news_item: RawNewsItem,
+        parsed_json: dict[str, Any],
+    ) -> AgentSignal:
+        published_at = news_item.published_at or mapped_news.available_at
+        available_at = news_item.available_at or mapped_news.available_at
+        return AgentSignal(
+            raw_news_id=mapped_news.raw_news_id,
+            llm_run_id=0,
+            vt_symbol=mapped_news.vt_symbol,
+            event=str(parsed_json["event"]),
+            relation_type=RelationType(parsed_json["relation_type"]),
+            impact_direction=ImpactDirection(parsed_json["impact_direction"]),
+            impact_strength=float(parsed_json["impact_strength"]),
+            time_horizon=TimeHorizon(parsed_json["time_horizon"]),
+            confidence=float(parsed_json["confidence"]),
+            reason=str(parsed_json["reason"]),
+            evidence=[str(parsed_json["evidence"])],
+            published_at=published_at,
+            available_at=available_at,
+            trading_date=available_at.date().isoformat(),
+            source=news_item.source,
+            source_item_id=news_item.source_item_id,
+            prompt_version=self.prompt_version,
+            schema_version=self.schema_version,
+        )
+
+    def _parse_and_validate(self, raw_response: str) -> tuple[dict[str, Any], tuple[str, ...]]:
+        errors: list[str] = []
+        try:
+            parsed = json.loads(raw_response)
+        except json.JSONDecodeError as exc:
+            return {}, (f"invalid JSON: {exc.msg}",)
+        if not isinstance(parsed, dict):
+            return {}, ("JSON root must be an object",)
+
+        for field in REQUIRED_FIELDS:
+            if field not in parsed:
+                errors.append(f"missing field: {field}")
+        if errors:
+            return parsed, tuple(errors)
+
+        self._validate_enum(parsed, "relation_type", RelationType, errors)
+        self._validate_enum(parsed, "impact_direction", ImpactDirection, errors)
+        self._validate_enum(parsed, "time_horizon", TimeHorizon, errors)
+        self._validate_unit_interval(parsed, "impact_strength", errors)
+        self._validate_unit_interval(parsed, "confidence", errors)
+        for field in ("event", "reason", "evidence"):
+            if not isinstance(parsed[field], str) or not parsed[field].strip():
+                errors.append(f"{field} must be a non-empty string")
+        return parsed, tuple(errors)
+
+    @staticmethod
+    def _validate_enum(
+        parsed: dict[str, Any],
+        field: str,
+        enum_type: type[Enum],
+        errors: list[str],
+    ) -> None:
+        try:
+            enum_type(parsed[field])
+        except ValueError:
+            allowed = [item.value for item in enum_type]
+            errors.append(f"{field} must be one of {allowed}")
+
+    @staticmethod
+    def _validate_unit_interval(parsed: dict[str, Any], field: str, errors: list[str]) -> None:
+        try:
+            number = float(parsed[field])
+        except (TypeError, ValueError):
+            errors.append(f"{field} must be a number between 0.0 and 1.0")
+            return
+        if not 0.0 <= number <= 1.0:
+            errors.append(f"{field} must be between 0.0 and 1.0")
+
+    @staticmethod
+    def _extract_content(response: Any) -> str:
+        return str(response.choices[0].message.content or "")
+
+    @staticmethod
+    def _extract_usage(response: Any) -> dict[str, Any]:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return {}
+        if isinstance(usage, dict):
+            return dict(usage)
+        if is_dataclass(usage):
+            return asdict(usage)
+        return {
+            key: getattr(usage, key)
+            for key in ("prompt_tokens", "completion_tokens", "total_tokens")
+            if hasattr(usage, key)
+        }
+
+    @staticmethod
+    def _http_status_code(exc: Exception) -> int | None:
+        value = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _hash_text(text: str) -> str:
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()

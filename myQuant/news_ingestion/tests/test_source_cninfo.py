@@ -143,6 +143,43 @@ class TestCninfoAnnouncementSource:
         assert item.body_status == "extracted"
         assert item.content == "mock extracted text content"
 
+    def test_pdf_failure_adds_fetch_error(self) -> None:
+        """PDF extraction failure adds descriptive error to fetch_errors in SourceFetchResult.error."""
+        calls: list[dict[str, object]] = []
+
+        def fake_transport(**kwargs: object) -> HttpResponse:
+            calls.append(kwargs)  # type: ignore[arg-type]
+            url = str(kwargs.get("url", ""))
+            if "topSearch" in url:
+                return _response_json(_ORG_FIXTURE)
+            if "hisAnnouncement" in url:
+                return _response_json(_ANNOUNCEMENT_FIXTURE)
+            return HttpResponse(
+                status_code=500,
+                text="Internal Server Error",
+                headers={},
+            )
+
+        client = PoliteHttpClient(
+            transport=fake_transport,
+            request_interval=0.0,
+            sleeper=lambda s: None,
+        )
+        source = CninfoAnnouncementSource(http_client=client)
+
+        query = NewsQuery(
+            vt_symbol="300750.SZSE",
+            start=date(2026, 1, 1),
+            end=date(2026, 1, 31),
+        )
+
+        result = source.fetch(query)
+
+        assert result.status is Status.SUCCESS
+        assert len(result.items) == 1
+        assert result.items[0].body_status == "failed"
+        assert "PDF" in result.error, f"Expected PDF extraction error in result.error, got: {result.error!r}"
+
     def test_pdf_failure_keeps_metadata(self) -> None:
         """RawNewsItem is still returned with body_status='failed' when PDF download fails."""
         calls: list[dict[str, object]] = []

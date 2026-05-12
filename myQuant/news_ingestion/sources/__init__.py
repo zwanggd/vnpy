@@ -1,4 +1,4 @@
-from .base import (
+from myQuant.news_ingestion.sources.base import (
     DEFAULT_REQUEST_INTERVAL,
     DEFAULT_RETRY_COUNT,
     DEFAULT_TIMEOUT,

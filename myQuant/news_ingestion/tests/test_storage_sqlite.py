@@ -420,3 +420,38 @@ def test_repository_instances_keep_separate_temp_databases(tmp_path: Path) -> No
 
     assert row_count(first_db_path, "agent_raw_news") == 1
     assert row_count(second_db_path, "agent_raw_news") == 0
+
+
+def test_is_raw_news_saved_returns_true_for_existing_item(tmp_path: Path) -> None:
+    db_path = tmp_path / "agent_news.db"
+    repository = AgentNewsSqliteRepository(db_path=db_path)
+    repository.initialize_schema()
+    item = raw_news_fixture()
+    repository.save_raw_news(item)
+
+    assert repository.is_raw_news_saved(
+        source_item_id=item.source_item_id,
+        source=item.source.value,
+    ) is True
+
+
+def test_is_raw_news_saved_returns_false_for_nonexistent_item(tmp_path: Path) -> None:
+    db_path = tmp_path / "agent_news.db"
+    repository = AgentNewsSqliteRepository(db_path=db_path)
+    repository.initialize_schema()
+
+    assert repository.is_raw_news_saved(
+        source_item_id="nonexistent-id",
+        source=Source.CNINFO.value,
+    ) is False
+
+
+def test_in_memory_db_does_not_create_file(tmp_path: Path) -> None:
+    repo = AgentNewsSqliteRepository(db_path=None)
+    repo.initialize_schema()
+    item = raw_news_fixture()
+    db_id = repo.save_raw_news(item)
+    assert db_id > 0
+    assert repo.count("agent_raw_news") == 1
+    # No file should exist on disk
+    assert not list(tmp_path.glob("*")), "In-memory DB should not create files"

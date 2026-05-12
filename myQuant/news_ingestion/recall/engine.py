@@ -25,7 +25,7 @@ GENERIC_MACRO_KEYWORDS = (
 )
 
 
-@dataclass(frozen=True)
+@dataclass
 class MappedNews:
     raw_news_id: int
     vt_symbol: str
@@ -87,7 +87,6 @@ class RecallEngine:
     def _deduplicate(self, news_items: list[RawNewsItem]) -> list[tuple[int, RawNewsItem]]:
         seen_source_ids: set[tuple[object, str]] = set()
         seen_hashes: set[tuple[object, str]] = set()
-        seen_near_duplicates: set[tuple[str, date | None, str]] = set()
         unique_items: list[tuple[int, RawNewsItem]] = []
 
         for index, item in enumerate(news_items, start=1):
@@ -103,15 +102,24 @@ class RecallEngine:
             if item.content_hash:
                 seen_hashes.add(hash_key)
 
-            near_duplicate_key = (
-                self._normalize_title(item.title),
+            unique_items.append((index, item))
+
+        return self._near_deduplicate(unique_items)
+
+    def _near_deduplicate(self, items: list[tuple[int, RawNewsItem]]) -> list[tuple[int, RawNewsItem]]:
+        seen: set[tuple[str, date | None, str]] = set()
+        result: list[tuple[int, RawNewsItem]] = []
+        for index, item in items:
+            key = (
+                self._normalize_title(item.title)[:40].lower(),
                 item.published_at.date() if isinstance(item.published_at, datetime) else item.published_at,
                 urlparse(item.url).hostname or "",
             )
-            seen_near_duplicates.add(near_duplicate_key)
-            unique_items.append((index, item))
-
-        return unique_items
+            if key in seen:
+                continue
+            seen.add(key)
+            result.append((index, item))
+        return result
 
     def _match_profile(
         self,

@@ -252,18 +252,28 @@ AGENT_MODELS = (
 
 class AgentNewsSqliteRepository:
     def __init__(self, db_path: str | Path | None = None) -> None:
-        self.db_path = _resolve_db_path(db_path)
-        self.database = SqliteDatabase(self.db_path)
+        self._in_memory = db_path is None or (isinstance(db_path, str) and db_path == ":memory:")
+        if self._in_memory:
+            self.db_path: Path | None = None
+            self.database = SqliteDatabase(":memory:")
+            self.database.connect(reuse_if_open=True)
+        else:
+            self.db_path = _resolve_db_path(db_path)
+            self.database = SqliteDatabase(str(self.db_path))
         self._bind_models()
 
     def _bind_models(self) -> None:
         self.database.bind(AGENT_MODELS, bind_refs=False, bind_backrefs=False)
 
     def initialize_schema(self) -> None:
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        if not self._in_memory:
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._bind_models()
-        with self.database.connection_context():
+        if self._in_memory:
             self.database.create_tables(AGENT_MODELS, safe=True)
+        else:
+            with self.database.connection_context():
+                self.database.create_tables(AGENT_MODELS, safe=True)
 
     def close(self) -> None:
         if not self.database.is_closed():
@@ -317,6 +327,16 @@ class AgentNewsSqliteRepository:
             if row:
                 return row
         return query.where(AgentRawNews.content_hash == content_hash).get()
+
+    def is_raw_news_saved(self, source_item_id: str, source: str) -> bool:
+        """Check if raw news with the given source+source_item_id already exists."""
+        if not source_item_id:
+            return False
+        self.initialize_schema()
+        return AgentRawNews.select().where(
+            (AgentRawNews.source == source)
+            & (AgentRawNews.source_item_id == source_item_id)
+        ).exists()
 
     def save_signal(self, signal: AgentSignal) -> int:
         self.initialize_schema()
@@ -570,6 +590,34 @@ class AgentNewsSqliteRepository:
         self.initialize_schema()
         with self.database.connection_context():
             return int(self.database.execute_sql(f"select count(*) from {table_name}").fetchone()[0])
+
+    def find_backfill_run_id(
+        self,
+        *,
+        start: str,
+        end: str,
+        symbols: list[str],
+        sources: tuple[str, ...],
+    ) -> str | None:
+        self.initialize_schema()
+        rows = AgentBackfillRun.select().where(
+            (AgentBackfillRun.status == "success")
+            & (AgentBackfillRun.config_json.contains(start))
+            & (AgentBackfillRun.config_json.contains(end))
+        )
+        for row in rows:
+            try:
+                config = json.loads(row.config_json or "{}")
+            except json.JSONDecodeError:
+                continue
+            if (
+                config.get("start") == start
+                and config.get("end") == end
+                and sorted(config.get("symbols", [])) == sorted(symbols)
+                and sorted(config.get("sources", [])) == sorted(sources)
+            ):
+                return str(row.run_id)
+        return None
 
     def get_stock_profile(self, vt_symbol: str) -> dict[str, Any] | None:
         self.initialize_schema()

@@ -74,3 +74,158 @@
 - Dedup order follows v0.1 policy: first `(source, source_item_id)`, then `(source, content_hash)`; near-duplicate keys are computed but retained for now.
 - Availability policy uses `published_at + 5 minutes` for datetimes, `15:00:00` for date-only items, and skips mappings for unknown publish time; `fetched_at` is not used as availability.
 - TDD red phase failed on missing `myQuant.news_ingestion.recall`; green verification passed: `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests/test_recall.py -q` (6 passed) and full news ingestion suite (38 passed). LSP diagnostics clean for recall package and `test_recall.py`.
+
+- Task 9: DeepSeek evaluator kept storage-agnostic by returning `LLMRunRecord`, `LLMOutputRecord`, and optional `AgentSignal`; failed attempts are exposed via `attempt_records` for callers that need to persist retry history. Importing `openai` lazily allows fake-client unit tests to run without the SDK installed while live construction still uses `DEEPSEEK_API_KEY` and DeepSeek base URL.
+
+## 2026-05-12 Task 10 pipeline and CLI
+- Created `myQuant/news_ingestion/pipeline.py` with `BackfillPipeline` and `PipelineResult` dataclass.
+- `BackfillPipeline.run()` follows spec order: init schema → create run → load profiles → fetch per source per symbol → save raw + fetch attempts → recall/dedupe → optional LLM → save signals → finalize run → return summary.
+- `PipelineResult` dataclass: `run_id`, `raw_count`, `mapped_count`, `signal_count`, `errors`.
+- Source factory pattern: `_default_source_factory()` creates real adapters; `_resolve_dry_run_source()` returns `_NoOpSource` that produces empty results for dry-run mode.
+- Dry-run uses `_NoOpSource` per source enum, skips LLM entirely (no `DEEPSEEK_API_KEY` needed).
+- Created `backtests/scripts/run_agent_news_backfill.py` with argparse supporting all 13 required options: `--start`, `--end`, `--symbols`, `--symbols-from-market-db`, `--market-db-path`, `--agent-db-path`, `--sources`, `--recall-strength` (low/medium/high), `--dry-run`, `--skip-llm`, `--max-llm-items`, `--resume`, `--report-path`.
+- CLI validates at least one of `--symbols` or `--symbols-from-market-db` is specified; validates `--recall-strength` choices.
+- CLI adds `sys.path.insert` for project root since `myQuant` is not an installed package; uses `# noqa: E402` for lint compliance.
+- Created `myQuant/news_ingestion/tests/test_pipeline.py` with 3 tests: `test_pipeline_import`, `test_cli_help` (subprocess via conda run), `test_pipeline_dry_run` (temp DB, dry-run → no signals, no errors).
+- Test `test_cli_help` runs CLI via subprocess with conda + PYTHONPATH to ensure import resolution.
+- Verification passed: `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests/test_pipeline.py -q` (3 passed), full news ingestion suite (46 passed). LSP diagnostics clean for all three files. CLI `--help` exits 0 and lists all 13 options.
+
+## 2026-05-12 Task 11 Markdown report generator
+- Created `myQuant/news_ingestion/reporting.py` with `generate_report(result, config)` function returning Markdown.
+- Signal data embedded in `config["signals"]` list rather than as a separate function parameter.
+- Secret hygiene via `_API_KEY_RE` regex (`sk-[a-zA-Z0-9]{20,}`) and `_redact()` helper; also redacts config keys matching sensitive patterns.
+- Report sections: Run Metadata, Stock List, Source Coverage (table with per-source items/errors/partial coverage), Counts, Top Sample Signals, Failures/Gaps, Short Conclusion.
+- Test file `test_reporting.py` created with 4 tests: required sections, API key redaction, 10-symbol inclusion, empty errors handling.
+- Verification passed: `test_reporting.py` 4 passed, full suite 50 passed (46 previous + 4 new).
+
+## 2026-05-12 F1 audit fixes (issues 1-3)
+
+### Issue 1: CLI evaluator wiring
+- **Root cause**: `BackfillPipeline` was always constructed without `evaluator=` parameter, so `self._evaluator` was always `None`.
+- **Fix**: Added `--no-skip-llm` CLI flag. When set and not `--dry-run`:
+  - Checks `DEEPSEEK_API_KEY` env var; warns and auto-skips if unset (never crashes).
+  - Constructs `DeepSeekNewsEvaluator()` and passes as `evaluator=` to `BackfillPipeline`.
+  - Sets `do_skip_llm = False` so pipeline actually runs LLM.
+  - If `--no-skip-llm` with `--dry-run`, warns and forces skip (mutually incompatible).
+- **Safety gate**: LLM never runs without explicit `--no-skip-llm`. Evaluator remains `None` by default.
+- **Added import**: `os` module for `os.environ` access.
+
+### Issue 2: Intermediate persistence (DB id mapping)
+- **Root cause**: 
+  1. `save_raw_news()` returns DB id (`int`) but it was discarded.
+  2. `RecallEngine._deduplicate()` assigns `raw_news_id` as 1-based list position (via `enumerate(news_items, start=1)`), not DB id.
+  3. Pipeline used this list index (`all_items[mapping.raw_news_id - 1]`) for LLM lookups and passed it to `save_llm_run()`/`save_signal()`.
+- **Fix**:
+  - `recall/engine.py`: Removed `frozen=True` from `MappedNews` dataclass (needed for post-recall mutation).
+  - `pipeline.py`:
+    - After saving raw news, built `db_id_for_position` (position→DB id) and `db_id_to_item` (DB id→RawNewsItem) maps.
+    - After recall, remapped `mapping.raw_news_id` from list position to actual DB id via `db_id_for_position`.
+    - LLM evaluation now uses `db_id_to_item.get(mapping.raw_news_id)` instead of list index.
+    - Added guard: if `news_item is None`, logs error and continues (instead of crashing).
+    - Persists `mapped_news` via `self.repo.save_mapped_news()` (method already existed in storage).
+  - `PipelineResult` augmented with: `llm_run_count`, `invalid_signals`, `signals`, `source_coverage`.
+  - Source coverage tracked per-source during fetch loop (items count, error count, coverage_status full/partial).
+
+### Issue 3: CLI uses reporting.py
+- **Root cause**: CLI had inline report generation (hardcoded markdown lines 171-200) instead of using `generate_report()`.
+- **Fix**: 
+  - Import `generate_report` from `myQuant.news_ingestion.reporting`.
+  - Build `report_config` dict with: start, end, symbols, sources, recall_strength, command, source_coverage, signals, llm_run_count, invalid_signals.
+  - Call `generate_report(result, report_config)` and write output to `report_path`.
+  - Removed inline report generation entirely.
+
+### Tests added
+- `test_pipeline_evaluator_wiring`: Verifies `FakeEvaluator.evaluate()` is called when evaluator is passed and `skip_llm=False`. Checks `llm_run_count > 0`.
+- `test_pipeline_skip_llm_skips_evaluator`: Verifies `FakeEvaluator.evaluate()` is NEVER called when `skip_llm=True`. Checks `llm_run_count == 0` and `signal_count == 0`.
+- Test helpers: `FakeEvaluator`, `_FakeSource`, `_fake_source_factory`, `_make_fake_news_item`, `_build_recall_engine`.
+
+### Verification
+- Full test suite: 53 passed, 4 skipped (up from 50 before).
+- `--help` output shows new `--no-skip-llm` flag.
+- Dry-run end-to-end: exit 0, report contains all required headers (## Run Metadata, ## Source Coverage, etc.).
+
+## 2026-05-12 F1 audit fixes (issues 5-6)
+
+### Issue 5: Empty except ImportError blocks in cninfo.py
+- **Root cause**: `_default_pdf_extractor()` had two `except ImportError: pass` blocks (lines 33-34, 49-50) that silently swallowed import failures for `pdfplumber` and `PyPDF2`, making debugging impossible.
+- **Fix**:
+  - Added module-level globals `_PDF_EXTRACTOR_AVAILABLE = True` and `_PDF_IMPORT_ERROR = ""`.
+  - Replaced both `except ImportError: pass` with `except ImportError as exc:` that stores `str(exc)` in `_PDF_IMPORT_ERROR`.
+  - Added `global _PDF_EXTRACTOR_AVAILABLE, _PDF_IMPORT_ERROR` declaration inside `_default_pdf_extractor`.
+  - Set `_PDF_EXTRACTOR_AVAILABLE = False` before the final `"skipped_no_pdf_extractor"` return (both imports failed).
+  - In `fetch()`: appends `PDF extractor unavailable: {_PDF_IMPORT_ERROR}` to `fetch_errors` when extraction is unavailable, so the error surfaces in `SourceFetchResult.error`.
+
+### Issue 6: Relative imports in __init__.py files
+- **Root cause**: Three `__init__.py` files used relative imports (`from .X import Y`) which are less explicit and can cause ambiguity.
+- **Fix**: Converted to absolute imports:
+  - `myQuant/news_ingestion/__init__.py`: `.contracts` → `myQuant.news_ingestion.contracts`, `.profiles` → `myQuant.news_ingestion.profiles`, `.storage` → `myQuant.news_ingestion.storage`
+  - `myQuant/news_ingestion/storage/__init__.py`: `.sqlite` → `myQuant.news_ingestion.storage.sqlite`
+  - `myQuant/news_ingestion/sources/__init__.py`: `.base` → `myQuant.news_ingestion.sources.base`
+
+### Verification
+- `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -c "from myQuant.news_ingestion import Source, RecallStrength, RawNewsItem, NewsQuery, AgentSignal; from myQuant.news_ingestion.storage import AgentNewsSqliteRepository; from myQuant.news_ingestion.sources.cninfo import CninfoAnnouncementSource; print('ALL IMPORTS OK')"` → **ALL IMPORTS OK**
+- `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests -q` → **54 passed, 4 skipped** (no regressions).
+
+## 2026-05-12 F2 Oracle audit fixes (Issues A and B)
+
+### Issue A: --resume flag not implemented
+
+- **Root cause**: `--resume` was accepted by argparse and passed to `pipeline.run(resume=True)` but `BackfillPipeline.run()` never used the `resume` parameter to skip already-saved items.
+- **Fixes**:
+  1. **`storage/sqlite.py`** — Added `is_raw_news_saved(source_item_id, source) -> bool` method that checks if a row exists in `agent_raw_news` with matching `source` + `source_item_id`. Returns `False` for empty `source_item_id`.
+  2. **`pipeline.py`** `run()` — In the fetch loop, when `resume=True`, calls `self.repo.is_raw_news_saved()` on each item before `save_raw_news()`. Already-saved items are skipped (not appended to `all_items`, not re-saved).
+  3. **Run-level resume** — Added `_resolve_run_id()` to `BackfillPipeline` and `find_backfill_run_id()` to `AgentNewsSqliteRepository`. When `resume=True`, searches for an existing SUCCESS `backfill_run` with matching start/end/symbols/sources by comparing JSON config. If found, reuses that `run_id` instead of generating a new one.
+
+### Issue B: --dry-run writes to real production DB
+
+- **Root cause**: CLI always created `AgentNewsSqliteRepository` with the real file path (`~/.vntrader/agent_news.db`) even in `--dry-run` mode. While source/LLM calls were skipped, schema creation, run records, and fetch attempts were still written to the production DB.
+- **Fixes**:
+  1. **`storage/sqlite.py`** — `AgentNewsSqliteRepository.__init__` now accepts `db_path=None` or `db_path=":memory:"` to create an in-memory SQLite database. Added `_in_memory` flag. `initialize_schema()` skips `mkdir` and `connection_context()` for in-memory (peewee's `connection_context()` creates a separate in-memory DB that loses tables on exit; instead uses persistent connection from `db.connect(reuse_if_open=True)`).
+  2. **`run_agent_news_backfill.py`** — When `args.dry_run` is `True`, creates repo with `db_path=None` (in-memory) instead of the real file path.
+
+### Tests added
+
+**`test_storage_sqlite.py`** (3 new):
+- `test_is_raw_news_saved_returns_true_for_existing_item` — saves a raw news item, verifies `is_raw_news_saved` returns `True`
+- `test_is_raw_news_saved_returns_false_for_nonexistent_item` — verifies `is_raw_news_saved` returns `False` for unknown source_item_id
+- `test_in_memory_db_does_not_create_file` — creates repo with `db_path=None`, saves data, verifies no files created on disk
+
+**`test_pipeline.py`** (2 new):
+- `test_resume_skips_saved_raw_news` — pre-inserts a raw news item with known `source_item_id`, runs pipeline with `resume=True` using a fake source that returns the same item, verifies `agent_raw_news` count stays 1 (item not duplicated)
+- `test_dry_run_uses_in_memory_db` — creates pipeline with `db_path=None` repo and `dry_run=True`, runs pipeline, verifies result is valid and run record was saved to in-memory DB
+
+### Verification
+- `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests -q` → **59 passed, 4 skipped** (5 new tests, 0 regressions)
+
+## 2026-05-12 Oracle final audit fixes (4 issues)
+
+### Issue 1: LLM retry attempts not persisted
+- **Root cause**: `pipeline.py:267` only persisted the final `(llm_run, llm_output)` returned by `evaluator.evaluate()`. The evaluator's `attempt_records` list containing earlier failed attempts was ignored.
+- **Additionally**: `save_llm_run` uses upsert on composite key `(raw_news_id, model, prompt_version, schema_version, input_hash)`, causing retry attempts with identical input to be merged into a single record.
+- **Fix** (`pipeline.py`): After `evaluate()` returns, iterate `self._evaluator.attempt_records[:-1]` (all except final). For each earlier attempt, append `-retry-{run_id}` to `input_hash` to bypass the upsert merge, then persist via `save_llm_run` + `save_llm_output`.
+
+### Issue 2: CNInfo PDF extraction failure not in fetch errors
+- **Root cause**: `cninfo.py:_parse_announcement` set `body_status="failed"` on the `RawNewsItem` but did not report the failure to the `fetch_errors` list in `fetch()`, so `SourceFetchResult.error` remained empty.
+- **Fix** (`sources/cninfo.py`): After appending item to `all_items` in the `fetch()` loop, check `item.body_status == "failed"` and append a descriptive error (`"PDF extraction failed for {title}"`) to `fetch_errors`.
+
+### Issue 3: Report hardcodes command instead of using config["command"]
+- **Root cause**: `reporting.py:22` had `f"- **Command**: \`conda run -n vnpy43\` (vnpy43 env)"` — ignoring `config.get("command")`.
+- **Fix** (`reporting.py`): Changed to `f"- **Command**: \`{config.get('command', 'conda run -n vnpy43 (vnpy43 env)')}\`"` so the actual CLI invocation appears in the report when provided.
+
+### Issue 4: Report source coverage not by source/month
+- **Root cause**: `reporting.py` only rendered aggregate per-source coverage table, ignoring `config["source_coverage_by_month"]`.
+- **Fix** (`reporting.py`): Accept optional `config["source_coverage_by_month"]` dict with shape `{source: {month: {"items": N, "errors": N}}}`. When present, render per-month sub-table under each source's aggregate row. Falls back to aggregate-only when absent.
+
+### Tests added
+**`test_pipeline.py`** (1 new):
+- `test_llm_retry_attempts_persisted` — `FakeEvaluatorWithRetries` records 2 attempts (1 failed + 1 success); verifies `repo.count("agent_llm_run") == 2`
+
+**`test_source_cninfo.py`** (1 new):
+- `test_pdf_failure_adds_fetch_error` — verifies `"PDF"` appears in `result.error` when PDF download returns HTTP 500
+
+**`test_reporting.py`** (2 new):
+- `test_report_uses_config_command` — verifies configured command appears in report
+- `test_report_by_source_month` — verifies monthly breakdown renders with month columns
+
+### Verification
+- `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests -q` → **63 passed, 4 skipped** (4 new tests, 0 regressions)

@@ -1,4 +1,4 @@
-from .contracts import (
+from myQuant.news_ingestion.contracts import (
     AgentSignal,
     BackfillConfig,
     ImpactDirection,
@@ -17,13 +17,13 @@ from .contracts import (
     generate_vt_symbol,
     parse_vt_symbol,
 )
-from .profiles import (
+from myQuant.news_ingestion.profiles import (
     DEFAULT_STOCK_PROFILES,
     discover_vt_symbols_from_market_db,
     get_stock_profile,
     persist_discovered_stock_profiles,
 )
-from .storage import AgentNewsSqliteRepository
+from myQuant.news_ingestion.storage import AgentNewsSqliteRepository
 
 __all__ = [
     "DEFAULT_STOCK_PROFILES",

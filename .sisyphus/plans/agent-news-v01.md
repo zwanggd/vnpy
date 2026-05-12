@@ -503,7 +503,7 @@ Wave 4: Task 13 (documentation/conventions update after implementation behavior 
 
   **Commit**: NO | Message: `feat(agent-news): add recall filtering and availability alignment` | Files: `myQuant/news_ingestion/recall/**`, tests
 
-- [ ] 9. Implement DeepSeek evaluator with fake-client TDD, schema validation, retries, and raw-output persistence
+- [x] 9. Implement DeepSeek evaluator with fake-client TDD, schema validation, retries, and raw-output persistence
 
   **What to do**: Implement `DeepSeekNewsEvaluator` behind an evaluator interface. Use `openai.OpenAI(api_key=os.environ['DEEPSEEK_API_KEY'], base_url='https://api.deepseek.com')`, model default `deepseek-v4-flash`, temperature `0.0`, max_tokens default `1024`, `response_format={'type':'json_object'}`, and `extra_body={'thinking': {'type': 'disabled'}}`. Prompt language: Chinese instructions, English field names. Schema version `agent_signal_v1`; prompt version `news_impact_v1`. Required JSON object fields: `event`, `relation_type`, `impact_direction`, `impact_strength`, `time_horizon`, `confidence`, `reason`, `evidence`. Validate enums/ranges. On invalid JSON/schema: store `agent_llm_run` + `agent_llm_output` with validation errors and create no `agent_signal`. Retry policy: retry up to 2 times for HTTP 429/500/503 and once for empty/invalid JSON with a concise repair prompt; persist every failed attempt.
   **Must NOT do**: Do not log or persist `DEEPSEEK_API_KEY`. Do not create signals from invalid outputs. Do not require API key for unit tests.
@@ -543,7 +543,7 @@ Wave 4: Task 13 (documentation/conventions update after implementation behavior 
 
   **Commit**: NO | Message: `feat(agent-news): add deepseek evaluator` | Files: `myQuant/news_ingestion/llm/**`, tests
 
-- [ ] 10. Implement offline backfill pipeline and CLI script
+- [x] 10. Implement offline backfill pipeline and CLI script
 
   **What to do**: Implement core pipeline in `myQuant/news_ingestion/pipeline.py` and thin CLI at `backtests/scripts/run_agent_news_backfill.py`. CLI options exactly:
   - `--start YYYY-MM-DD`
@@ -596,7 +596,7 @@ Wave 4: Task 13 (documentation/conventions update after implementation behavior 
 
   **Commit**: NO | Message: `feat(agent-news): add offline backfill cli` | Files: `myQuant/news_ingestion/pipeline.py`, `backtests/scripts/run_agent_news_backfill.py`, tests
 
-- [ ] 11. Implement Markdown/JSON reporting for source coverage, counts, samples, and conclusions
+- [x] 11. Implement Markdown/JSON reporting for source coverage, counts, samples, and conclusions
 
   **What to do**: Generate a Markdown report for every run at `backtests/results/<date>_agent_news_v01_<scope>.md` plus optional JSON summary in the same directory. Required report sections: run metadata, command, env `vnpy43`, date range, sources, recall_strength, stock list, source coverage table by source/month, raw item counts, filtered candidate counts, LLM run counts, valid/invalid signal counts, top sample signals, failures/gaps, short conclusion. Include “coverage is partial” where source adapters expose no reliable date-range history.
   **Must NOT do**: Do not include API keys, raw full article bodies, or full LLM prompts in Markdown report; those belong in SQLite.
@@ -634,7 +634,7 @@ Wave 4: Task 13 (documentation/conventions update after implementation behavior 
 
   **Commit**: NO | Message: `feat(agent-news): add backfill reporting` | Files: `myQuant/news_ingestion/reporting.py`, tests
 
-- [ ] 12. Run source accessibility smoke tests and the requested 10-stock five-year pilot
+- [x] 12. Run source accessibility smoke tests and the requested 10-stock five-year pilot
 
   **What to do**: After all deterministic tests pass, run live source smoke tests and the full offline pilot. Use exact 10-stock universe from market DB query, date range `2021-01-01` to `2026-05-08` for “five years” aligned to available market data end. If user later wants exact database full range, CLI can run `2020-01-02` to `2026-05-08`, but v0.1 pilot uses five calendar years ending at current DB end. Commands:
   ```bash
@@ -681,7 +681,7 @@ Wave 4: Task 13 (documentation/conventions update after implementation behavior 
 
   **Commit**: NO | Message: `test(agent-news): run v0.1 pilot backfill` | Files: `backtests/results/*agent_news_v01_10stocks_5y.md`, DB evidence only if explicitly tracked separately
 
-- [ ] 13. Update local project documentation with module usage and conventions
+- [x] 13. Update local project documentation with module usage and conventions
 
   **What to do**: Update local docs (prefer `myREADME.md`, and optionally `backtests/README.md` if created by executor) with: module location, DB path `~/.vntrader/agent_news.db`, command examples, source policy, `DEEPSEEK_API_KEY` env var, `vnpy43` requirement, report location, and warning that v0.1 is offline research/backfill only.
   **Must NOT do**: Do not document credentials or API keys. Do not claim source completeness.

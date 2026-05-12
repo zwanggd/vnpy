@@ -16,9 +16,13 @@ PDF_BASE_URL = "http://static.cninfo.com.cn"
 MAX_PAGES = 100
 PAGE_SIZE = 30
 
+_PDF_EXTRACTOR_AVAILABLE = True
+_PDF_IMPORT_ERROR = ""
+
 
 def _default_pdf_extractor(pdf_bytes: bytes) -> dict[str, Any]:
     """Try pdfplumber first, then PyPDF2.  Return ``{"text": ... , "status": ...}``."""
+    global _PDF_EXTRACTOR_AVAILABLE, _PDF_IMPORT_ERROR
     try:
         import pdfplumber  # noqa: F811
 
@@ -30,8 +34,8 @@ def _default_pdf_extractor(pdf_bytes: bytes) -> dict[str, Any]:
                     pages_text.append(text)
             if pages_text:
                 return {"text": "\n".join(pages_text), "status": "extracted"}
-    except ImportError:
-        pass
+    except ImportError as exc:
+        _PDF_IMPORT_ERROR = str(exc)
     except Exception:
         return {"text": "", "status": "failed"}
 
@@ -46,11 +50,12 @@ def _default_pdf_extractor(pdf_bytes: bytes) -> dict[str, Any]:
                 pages_text.append(text)
         if pages_text:
             return {"text": "\n".join(pages_text), "status": "extracted"}
-    except ImportError:
-        pass
+    except ImportError as exc:
+        _PDF_IMPORT_ERROR = str(exc)
     except Exception:
         return {"text": "", "status": "failed"}
 
+    _PDF_EXTRACTOR_AVAILABLE = False
     return {"text": "", "status": "skipped_no_pdf_extractor"}
 
 
@@ -126,12 +131,18 @@ class CninfoAnnouncementSource(BaseNewsSource):
                 item = self._parse_announcement(ann)
                 if item is not None:
                     all_items.append(item)
+                    if item.body_status == "failed":
+                        fetch_errors.append(
+                            f"PDF extraction failed for {item.title or item.source_item_id}"
+                        )
 
             # -- pagination guard ---------------------------------------
             has_more = data.get("hasMore", False)
             if not has_more:
                 break
 
+        if not _PDF_EXTRACTOR_AVAILABLE and _PDF_IMPORT_ERROR:
+            fetch_errors.append(f"PDF extractor unavailable: {_PDF_IMPORT_ERROR}")
         error_summary = "; ".join(fetch_errors) if fetch_errors else ""
         return SourceFetchResult(
             source=Source.CNINFO,

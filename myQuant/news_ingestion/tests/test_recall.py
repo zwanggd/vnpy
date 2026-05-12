@@ -181,3 +181,15 @@ def test_unknown_publish_time_does_not_create_mapped_news() -> None:
     mapped = engine.filter_and_map([unknown_time_news], RecallStrength.LOW)
 
     assert mapped == []
+
+
+def test_near_duplicate_filtered() -> None:
+    engine = RecallEngine(stock_profiles())
+    items = [
+        news_item("id1", "宁德时代发布储能新品"),
+        news_item("id2", "宁德时代发布储能新品"),
+    ]
+    mapped = engine.filter_and_map(items, RecallStrength.LOW)
+
+    assert len(mapped) == 1
+    assert mapped[0].raw_news_id == 1
