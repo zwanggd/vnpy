@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import urllib.parse
 from collections.abc import Callable
 from datetime import date, datetime
 from io import BytesIO
@@ -12,12 +13,47 @@ from myQuant.news_ingestion.sources.base import BaseNewsSource, PoliteHttpClient
 
 SEARCH_URL = "http://www.cninfo.com.cn/new/hisAnnouncement/query"
 ORG_LOOKUP_URL = "http://www.cninfo.com.cn/new/information/topSearch/query"
+SZSE_STOCK_URL = "http://www.cninfo.com.cn/new/data/szse_stock.json"
+SSE_STOCK_URL = "http://www.cninfo.com.cn/new/data/sse_stock.json"
 PDF_BASE_URL = "http://static.cninfo.com.cn"
 MAX_PAGES = 100
 PAGE_SIZE = 30
+# Safety cap: stop even if hasMore is true; with orgId filtering, 20 pages suffices
+HARD_PAGE_LIMIT = 200
 
 _PDF_EXTRACTOR_AVAILABLE = True
 _PDF_IMPORT_ERROR = ""
+
+_ORG_ID_CACHE: dict[str, str] = {}
+_ORG_ID_CACHE_LOADED = False
+
+
+def _load_org_id_cache(http_client: PoliteHttpClient) -> None:
+    global _ORG_ID_CACHE, _ORG_ID_CACHE_LOADED
+    if _ORG_ID_CACHE_LOADED:
+        return
+
+    for url in (SZSE_STOCK_URL, SSE_STOCK_URL):
+        try:
+            response = http_client.get(url)
+            if response.status == Status.SUCCESS:
+                data = json.loads(response.text)
+                items = data.get("stockList") if isinstance(data, dict) else data
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, dict):
+                            code = str(item.get("code", "")).strip()
+                            org_id = str(item.get("orgId", "")).strip()
+                            if code and org_id:
+                                _ORG_ID_CACHE[code] = org_id
+        except Exception:
+            pass
+
+    _ORG_ID_CACHE_LOADED = True
+
+
+def _get_org_id(symbol: str) -> str:
+    return _ORG_ID_CACHE.get(symbol, "")
 
 
 def _default_pdf_extractor(pdf_bytes: bytes) -> dict[str, Any]:
@@ -88,29 +124,44 @@ class CninfoAnnouncementSource(BaseNewsSource):
         start_str = self._format_date(query.start)
         end_str = self._format_date(query.end)
 
-        # -- org lookup (best-effort) -----------------------------------
-        org_id = self._lookup_org(query.symbol)
+        # -- org ID cache (best-effort) ---------------------------------
+        _load_org_id_cache(self._http)
+        org_id = _get_org_id(query.symbol)
+        if not org_id:
+            org_id = self._lookup_org(query.symbol)
+
+        # -- exchange → column ------------------------------------------
+        exchange_lower = query.exchange.lower()
+        column = exchange_lower if exchange_lower in ("szse", "sse") else "szse"
 
         # -- paginated search -------------------------------------------
         all_items: list[RawNewsItem] = []
         fetch_errors: list[str] = []
 
         for page_num in range(1, MAX_PAGES + 1):
-            search_body: dict[str, object] = {
-                "seDate": f"{start_str}~{end_str}",
-                "pageNum": page_num,
-                "pageSize": PAGE_SIZE,
-                "tabName": "fulltext",
-            }
-            if query.symbol:
-                search_body["stock"] = query.symbol
+            form_pairs: list[tuple[str, str]] = [
+                ("pageNum", str(page_num)),
+                ("pageSize", str(PAGE_SIZE)),
+                ("tabName", "fulltext"),
+                ("column", column),
+                ("seDate", f"{start_str}~{end_str}"),
+                ("sortName", "announcementTime"),
+                ("sortType", "-1"),
+            ]
             if org_id:
-                search_body["orgId"] = org_id
+                form_pairs.append(("stock", f"{query.symbol},{org_id}"))
+            else:
+                form_pairs.append(("stock", query.symbol))
+
+            data = urllib.parse.urlencode(form_pairs)
 
             response = self._http.post(
                 SEARCH_URL,
-                json_body=search_body,
-                headers={"Content-Type": "application/json"},
+                data=data,
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
             )
 
             if response.status != Status.SUCCESS:
@@ -138,7 +189,16 @@ class CninfoAnnouncementSource(BaseNewsSource):
 
             # -- pagination guard ---------------------------------------
             has_more = data.get("hasMore", False)
-            if not has_more:
+            if not has_more or page_num >= HARD_PAGE_LIMIT:
+                break
+
+            # CNInfo may ignore seDate and return all-time results;
+            # stop when all parsed items on this page are before start
+            page_before_start = all(
+                item.published_at is not None and item.published_at.date() < query.start
+                for item in all_items[-len(announcements):] if item.published_at is not None
+            )
+            if page_before_start and announcements:
                 break
 
         if not _PDF_EXTRACTOR_AVAILABLE and _PDF_IMPORT_ERROR:
@@ -184,6 +244,10 @@ class CninfoAnnouncementSource(BaseNewsSource):
                     break
                 except ValueError:
                     continue
+        if published_at is None:
+            ann_time = ann.get("announcementTime")
+            if isinstance(ann_time, (int, float)) and ann_time > 0:
+                published_at = datetime.fromtimestamp(ann_time / 1000)
 
         # -- source_item_id / url ---------------------------------------
         source_item_id = adjunct_url if adjunct_url else title

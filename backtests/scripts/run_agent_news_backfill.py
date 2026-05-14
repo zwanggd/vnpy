@@ -33,6 +33,20 @@ def parse_date(date_str: str) -> date:
     return datetime.strptime(date_str, "%Y-%m-%d").date()
 
 
+def _detect_llama_cpp_model(base_url: str) -> str | None:
+    """Query llama.cpp server /v1/models to detect the loaded model."""
+    from openai import OpenAI
+
+    try:
+        client = OpenAI(base_url=base_url, api_key="not-needed", timeout=5.0)
+        models = client.models.list()
+        if models.data:
+            return models.data[0].id
+    except Exception:
+        pass
+    return None
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Agent News v0.1 offline backfill pipeline",
@@ -95,6 +109,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Explicitly enable LLM evaluation (requires DEEPSEEK_API_KEY)",
     )
     parser.add_argument(
+        "--llm-provider",
+        default="deepseek",
+        choices=["deepseek", "llama_cpp"],
+        help="LLM backend provider (default: deepseek)",
+    )
+    parser.add_argument(
+        "--llm-base-url",
+        default="",
+        help="LLM API base URL (auto-detected from provider when empty)",
+    )
+    parser.add_argument(
+        "--llm-model",
+        default="",
+        help="Override LLM model name (auto-detected when empty)",
+    )
+    parser.add_argument(
+        "--llm-workers",
+        type=int,
+        default=1,
+        help="Number of parallel LLM workers (default: 1, set to match llama.cpp --parallel)",
+    )
+    parser.add_argument(
         "--max-llm-items",
         type=int,
         default=0,
@@ -154,16 +190,34 @@ def main(argv: Sequence[str] | None = None) -> int:
     evaluator = None
 
     if args.no_skip_llm and not args.dry_run:
-        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-        if not api_key:
-            print(
-                "Warning: DEEPSEEK_API_KEY not set. LLM evaluation will be skipped.",
-                file=sys.stderr,
-            )
-            do_skip_llm = True
-        else:
+        if args.llm_provider == "deepseek":
+            api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+            if not api_key:
+                print(
+                    "Warning: DEEPSEEK_API_KEY not set. LLM evaluation will be skipped.",
+                    file=sys.stderr,
+                )
+                do_skip_llm = True
+            else:
+                from myQuant.news_ingestion.llm.evaluator import DeepSeekNewsEvaluator  # noqa: E402
+                evaluator = DeepSeekNewsEvaluator()
+                do_skip_llm = False
+        elif args.llm_provider == "llama_cpp":
             from myQuant.news_ingestion.llm.evaluator import DeepSeekNewsEvaluator  # noqa: E402
-            evaluator = DeepSeekNewsEvaluator()
+
+            base_url = args.llm_base_url or "http://127.0.0.1:8080/v1"
+            model = args.llm_model or "Qwen3.6-35B-A3B-Q4_K_M.gguf"
+
+            if not args.llm_model:
+                detected = _detect_llama_cpp_model(base_url)
+                if detected:
+                    model = detected
+                    print(f"[detect] llama.cpp model: {model}", file=sys.stderr)
+
+            evaluator = DeepSeekNewsEvaluator.for_llama_cpp(
+                base_url=base_url,
+                model=model,
+            )
             do_skip_llm = False
     elif args.no_skip_llm and args.dry_run:
         print(
@@ -188,6 +242,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_llm_items=args.max_llm_items,
         skip_llm=do_skip_llm,
         resume=args.resume,
+        llm_workers=args.llm_workers,
     )
 
     # -- Print summary ------------------------------------------------------

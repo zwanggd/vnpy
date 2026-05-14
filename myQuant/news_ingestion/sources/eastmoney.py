@@ -11,7 +11,9 @@ from typing import Any
 from myQuant.news_ingestion.contracts import NewsQuery, RawNewsItem, Source, SourceCategory, Status
 from myQuant.news_ingestion.sources.base import BaseNewsSource, PoliteHttpClient, SourceFetchResult
 
-STOCK_SEARCH_URL = "https://search-api-web.eastmoney.com/search/jsonp"
+ANNOUNCEMENT_URL = "https://np-anotice-stock.eastmoney.com/api/security/ann"
+ANNOUNCEMENT_PAGE_SIZE = 50
+ANNOUNCEMENT_MAX_PAGES = 50
 KEYWORD_SEARCH_URL = "https://so.eastmoney.com/news/s"
 
 
@@ -36,15 +38,43 @@ class EastmoneyNewsSource(BaseNewsSource):
         errors: list[str] = []
 
         if query.symbol:
+            # Primary: announcement endpoint (stock-targeted, paginated JSON)
+            for page_index in range(1, ANNOUNCEMENT_MAX_PAGES + 1):
+                response = self._http.get(
+                    ANNOUNCEMENT_URL,
+                    params={
+                        "sr": "-1",
+                        "page_size": str(ANNOUNCEMENT_PAGE_SIZE),
+                        "page_index": str(page_index),
+                        "ann_type": "A",
+                        "client_source": "web",
+                        "stock_list": query.symbol,
+                    },
+                )
+                if response.status != Status.SUCCESS:
+                    errors.append(response.error)
+                    break
+
+                page_items = _parse_announcement_items(response.text, SourceCategory.ANNOUNCEMENT)
+                if not page_items:
+                    break
+                items.extend(page_items)
+
+                if len(page_items) < ANNOUNCEMENT_PAGE_SIZE:
+                    break
+
+        # Fallback 1: keyword search with stock symbol
+        if not items and query.symbol:
             response = self._http.get(
-                STOCK_SEARCH_URL,
-                params={"keyword": query.symbol, "type": "news"},
+                KEYWORD_SEARCH_URL,
+                params={"keyword": query.symbol},
             )
             if response.status is Status.SUCCESS:
                 items.extend(self._parse_response(response.text, SourceCategory.FINANCIAL_NEWS))
             else:
                 errors.append(response.error)
 
+        # Fallback 2: keyword search with provided keywords
         if not items and query.keywords:
             response = self._http.get(
                 KEYWORD_SEARCH_URL,
@@ -263,6 +293,68 @@ def _parse_datetime(value: str) -> datetime | None:
         except ValueError:
             continue
     return None
+
+
+def _parse_announcement_items(text: str, category: SourceCategory) -> list[RawNewsItem]:
+    if not text.strip():
+        return []
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return []
+    data = payload.get("data") if isinstance(payload, dict) else None
+    if not isinstance(data, dict):
+        return []
+    items_list = data.get("list")
+    if not isinstance(items_list, list):
+        return []
+
+    result: list[RawNewsItem] = []
+    for record in items_list:
+        if not isinstance(record, dict):
+            continue
+        item = _raw_item_from_announcement(record, category)
+        if item is not None:
+            result.append(item)
+    return result
+
+
+def _raw_item_from_announcement(record: dict[str, Any], category: SourceCategory) -> RawNewsItem | None:
+    title = _clean_text(str(record.get("title", "")))
+    if not title:
+        return None
+
+    content = _clean_text(str(record.get("content", "")))
+    source_item_id = str(record.get("art_code", ""))
+
+    notice_date = record.get("notice_date")
+    published_at = None
+    if notice_date is not None:
+        try:
+            ts = int(notice_date)
+            if ts > 10_000_000_000:
+                ts //= 1000
+            published_at = datetime.fromtimestamp(ts)
+        except (ValueError, OSError):
+            published_at = _parse_datetime(str(notice_date))
+
+    url = _normalize_url(str(record.get("pdf_url", "")))
+    body_status = "inline" if published_at is not None else "missing_published_at"
+
+    return RawNewsItem(
+        source=Source.EASTMONEY,
+        source_category=category,
+        title=title,
+        content=content,
+        summary=content,
+        content_hash=_compute_content_hash(title, content),
+        source_item_id=source_item_id or title,
+        url=url,
+        published_at=published_at,
+        body_status=body_status,
+        raw_payload=record,
+        language="zh",
+    )
 
 
 def _warnings_for_items(items: list[RawNewsItem]) -> list[str]:

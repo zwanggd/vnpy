@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import uuid
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
@@ -45,6 +46,9 @@ class DeepSeekNewsEvaluator:
         max_tokens: int = 1024,
         prompt_version: str = "news_impact_v1",
         schema_version: str = "agent_signal_v1",
+        use_completions_api: bool = False,
+        strip_thinking: bool = False,
+        provider: str = "deepseek",
     ) -> None:
         self.client = client or self._default_client()
         self.model = model
@@ -52,6 +56,9 @@ class DeepSeekNewsEvaluator:
         self.max_tokens = max_tokens
         self.prompt_version = prompt_version
         self.schema_version = schema_version
+        self.use_completions_api = use_completions_api
+        self.strip_thinking = strip_thinking
+        self.provider = provider
         self.attempt_records: list[tuple[LLMRunRecord, LLMOutputRecord]] = []
 
     @staticmethod
@@ -63,6 +70,24 @@ class DeepSeekNewsEvaluator:
             base_url="https://api.deepseek.com",
         )
 
+    @classmethod
+    def for_llama_cpp(
+        cls,
+        base_url: str = "http://127.0.0.1:8080/v1",
+        model: str = "Qwen3.6-35B-A3B-Q4_K_M.gguf",
+        **kwargs: Any,
+    ) -> DeepSeekNewsEvaluator:
+        from openai import OpenAI
+
+        kwargs.setdefault("use_completions_api", True)
+        kwargs.setdefault("strip_thinking", True)
+        kwargs.setdefault("provider", "llama_cpp")
+        return cls(
+            client=OpenAI(base_url=base_url, api_key="not-needed"),
+            model=model,
+            **kwargs,
+        )
+
     def evaluate(
         self,
         mapped_news: MappedNews,
@@ -70,7 +95,8 @@ class DeepSeekNewsEvaluator:
     ) -> tuple[LLMRunRecord, LLMOutputRecord, AgentSignal | None]:
         self.attempt_records = []
         prompt = self._build_prompt(mapped_news, news_item)
-        messages = [{"role": "user", "content": prompt}]
+        messages: list[dict[str, str]] = [{"role": "user", "content": prompt}]
+        full_prompt = prompt
         input_hash = self._hash_text(prompt)
         http_attempts = 0
         repaired_invalid_json = False
@@ -79,15 +105,33 @@ class DeepSeekNewsEvaluator:
             http_attempts += 1
             started_at = datetime.now()
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
-                    response_format={"type": "json_object"},
-                    extra_body={"thinking": {"type": "disabled"}},
-                )
-                raw_response = self._extract_content(response)
+                if self.use_completions_api:
+                    response = self.client.completions.create(
+                        model=self.model,
+                        prompt=full_prompt,
+                        max_tokens=self.max_tokens,
+                        temperature=self.temperature,
+                        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+                    )
+                    raw_response = str(response.choices[0].text or "")
+                    if self.strip_thinking:
+                        raw_response = re.sub(
+                            r"<think>.*?</think>",
+                            "",
+                            raw_response,
+                            flags=re.DOTALL,
+                        )
+                else:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        temperature=self.temperature,
+                        max_tokens=self.max_tokens,
+                        response_format={"type": "json_object"},
+                        extra_body={"thinking": {"type": "disabled"}},
+                    )
+                    raw_response = str(response.choices[0].message.content or "")
+
                 token_usage = self._extract_usage(response)
                 parsed_json, errors = self._parse_and_validate(raw_response)
                 if errors and not repaired_invalid_json:
@@ -102,8 +146,15 @@ class DeepSeekNewsEvaluator:
                         status=Status.FAILED,
                     )
                     self.attempt_records.append((run, output))
-                    messages.append({"role": "assistant", "content": raw_response})
-                    messages.append({"role": "user", "content": REPAIR_PROMPT})
+                    if self.use_completions_api:
+                        full_prompt = (
+                            f"{prompt}\n\n"
+                            f"Previous response was not valid JSON.\n"
+                            f"{REPAIR_PROMPT}"
+                        )
+                    else:
+                        messages.append({"role": "assistant", "content": raw_response})
+                        messages.append({"role": "user", "content": REPAIR_PROMPT})
                     repaired_invalid_json = True
                     continue
 
@@ -176,21 +227,28 @@ class DeepSeekNewsEvaluator:
         status: Status,
         error: str = "",
     ) -> tuple[LLMRunRecord, LLMOutputRecord]:
-        run_id = f"deepseek-{uuid.uuid4().hex}"
+        run_id = f"{self.provider}-{uuid.uuid4().hex}"
         finished_at = datetime.now()
-        run = LLMRunRecord(
-            run_id=run_id,
-            raw_news_id=mapped_news.raw_news_id,
-            provider="deepseek",
-            model=self.model,
-            prompt_version=self.prompt_version,
-            schema_version=self.schema_version,
-            parameters={
+        if self.use_completions_api:
+            params: dict[str, Any] = {
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+            }
+        else:
+            params = {
                 "temperature": self.temperature,
                 "max_tokens": self.max_tokens,
                 "response_format": {"type": "json_object"},
                 "extra_body": {"thinking": {"type": "disabled"}},
-            },
+            }
+        run = LLMRunRecord(
+            run_id=run_id,
+            raw_news_id=mapped_news.raw_news_id,
+            provider=self.provider,
+            model=self.model,
+            prompt_version=self.prompt_version,
+            schema_version=self.schema_version,
+            parameters=params,
             input_hash=input_hash,
             status=status,
             started_at=started_at,
@@ -284,10 +342,6 @@ class DeepSeekNewsEvaluator:
             return
         if not 0.0 <= number <= 1.0:
             errors.append(f"{field} must be between 0.0 and 1.0")
-
-    @staticmethod
-    def _extract_content(response: Any) -> str:
-        return str(response.choices[0].message.content or "")
 
     @staticmethod
     def _extract_usage(response: Any) -> dict[str, Any]:

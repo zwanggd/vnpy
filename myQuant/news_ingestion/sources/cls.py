@@ -152,6 +152,8 @@ class ClsTelegraphSource(BaseNewsSource):
         ctime = row.get("ctime")
         if not title and not content:
             raise ValueError("telegraph item missing title/content")
+        if not title:
+            title = content[:80]
         if not source_item_id:
             raise ValueError("telegraph item missing id")
         if ctime is None:

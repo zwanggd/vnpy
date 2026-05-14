@@ -8,6 +8,8 @@ from datetime import date, datetime
 from collections.abc import Callable
 from typing import Any
 
+from tqdm import tqdm
+
 from myQuant.news_ingestion.contracts import (
     NewsQuery,
     RawNewsItem,
@@ -124,6 +126,7 @@ class BackfillPipeline:
         max_llm_items: int = 0,
         skip_llm: bool = False,
         resume: bool = False,
+        llm_workers: int = 1,
     ) -> PipelineResult:
         """Execute the pipeline and return a summary."""
         run_id = self._resolve_run_id(resume=resume, start=start, end=end, symbols=symbols, sources=sources)
@@ -164,7 +167,7 @@ class BackfillPipeline:
             src_items = 0
             src_errors = 0
             src_status = "full"
-            for vt_symbol in symbols:
+            for vt_symbol in tqdm(symbols, desc=f"Fetching {source_enum.value}", unit="symbol"):
                 profile = profiles.get(vt_symbol)
                 if profile is None:
                     continue
@@ -241,7 +244,7 @@ class BackfillPipeline:
             mapping.raw_news_id = db_id_for_position.get(mapping.raw_news_id, mapping.raw_news_id)
 
         # Persist mapped_news to DB
-        for mapping in mapped_news:
+        for mapping in tqdm(mapped_news, desc="Persisting recall results", unit="item"):
             self.repo.save_mapped_news(mapping)
 
         mapped_count = len(mapped_news)
@@ -253,25 +256,43 @@ class BackfillPipeline:
         if self.dry_run or skip_llm or self._evaluator is None:
             pass  # No LLM in dry-run or skip mode
         else:
-            for mapping in mapped_news:
-                if max_llm_items > 0 and evaluated >= max_llm_items:
-                    break
-                news_item = db_id_to_item.get(mapping.raw_news_id)
-                if news_item is None:
-                    errors.append(
-                        f"No raw news item found for DB id {mapping.raw_news_id}"
-                        f" [{mapping.vt_symbol}]"
-                    )
-                    continue
-                try:
-                    llm_run, llm_output, signal = self._evaluator.evaluate(mapping, news_item)
+            import concurrent.futures
+
+            llm_workers = llm_workers if llm_workers > 0 else 1
+            items_to_eval = [
+                (m, db_id_to_item.get(m.raw_news_id))
+                for m in mapped_news
+                if db_id_to_item.get(m.raw_news_id) is not None
+            ]
+            if max_llm_items > 0:
+                items_to_eval = items_to_eval[:max_llm_items]
+
+            def _eval_one(mapping, news_item):
+                llm_run, llm_output, signal = self._evaluator.evaluate(mapping, news_item)
+                attempts = list(self._evaluator.attempt_records)
+                return mapping, news_item, llm_run, llm_output, signal, attempts
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=llm_workers) as executor:
+                futures = {
+                    executor.submit(_eval_one, m, ni): (m, ni)
+                    for m, ni in items_to_eval
+                }
+                for future in tqdm(
+                    concurrent.futures.as_completed(futures),
+                    total=len(futures),
+                    desc="LLM evaluating",
+                    unit="item",
+                ):
+                    try:
+                        mapping, news_item, llm_run, llm_output, signal, attempts = future.result()
+                    except Exception as exc:
+                        errors.append(f"LLM evaluation failed: {exc}")
+                        continue
                     llm_run.run_id = run_id
                     run_db_id = self.repo.save_llm_run(llm_run)
                     llm_output.llm_run_id = run_db_id
                     self.repo.save_llm_output(llm_output)
                     evaluated += 1
-                    # Persist earlier retry attempts (all but the final one already saved)
-                    attempts = getattr(self._evaluator, "attempt_records", [])
                     if len(attempts) > 1:
                         for prev_run, prev_output in attempts[:-1]:
                             prev_run.run_id = run_id
@@ -280,19 +301,17 @@ class BackfillPipeline:
                             prev_output.llm_run_id = prev_db_id
                             self.repo.save_llm_output(prev_output)
                     if signal is not None:
+                        signal.raw_news_id = mapping.raw_news_id
                         signal.llm_run_id = run_db_id
                         self.repo.save_signal(signal)
                         signal_count += 1
-                        signals_data.append({
-                            "vt_symbol": signal.vt_symbol,
-                            "event": signal.event,
-                            "impact_direction": signal.impact_direction.value,
-                            "impact_strength": signal.impact_strength,
-                            "confidence": signal.confidence,
-                        })
-                except Exception as exc:
-                    errors.append(f"LLM error: {exc}")
-
+                        signals_data.append(dict(
+                            vt_symbol=signal.vt_symbol,
+                            event=signal.event,
+                            impact_direction=str(signal.impact_direction) if signal.impact_direction else "",
+                            impact_strength=signal.impact_strength,
+                            confidence=signal.confidence,
+                        ))
             self.repo.save_fetch_attempt(
                 run_id=run_id,
                 source="llm",
@@ -300,7 +319,6 @@ class BackfillPipeline:
                 items_found=evaluated,
                 items_saved=signal_count,
             )
-
         invalid_signals = evaluated - signal_count
 
         # -- 7. Finalize run ---------------------------------------------------

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import urllib.parse
 from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Any
@@ -90,9 +91,10 @@ def _is_pdf(kwargs: Mapping[str, Any]) -> bool:
 
 
 def _page_num_from_search(kwargs: Mapping[str, Any]) -> int:
-    json_body = kwargs.get("json")
-    if isinstance(json_body, Mapping):
-        return int(json_body.get("pageNum", 1))
+    data = kwargs.get("data")
+    if isinstance(data, str):
+        parsed = dict(urllib.parse.parse_qsl(data))
+        return int(parsed.get("pageNum", 1))
     return 1
 
 

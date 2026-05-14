@@ -229,3 +229,71 @@
 
 ### Verification
 - `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests -q` → **63 passed, 4 skipped** (4 new tests, 0 regressions)
+
+## 2026-05-12 Source adapter fixes (Fix 1-3)
+
+### Fix 1: CNInfo — orgId cache + form-encoded POST
+
+- **Root cause**: CNInfo search endpoint requires `stock={code},{orgId}` form-encoded, NOT JSON body with separate `stock`+`orgId`. Also requires `X-Requested-With: XMLHttpRequest` header. orgId is NOT derived from code (e.g., `gssz0300750`) — it's unique per stock (e.g., `GD165627` for 300750).
+- **Fix**:
+  - Added module-level `_ORG_ID_CACHE` backed by downloading `http://www.cninfo.com.cn/new/data/szse_stock.json` and `sse_stock.json` (response format: `{"stockList": [{"code": "...", "orgId": "...", ...}]}`).
+  - `_load_org_id_cache()` lazily populates on first `fetch()` call; `_get_org_id(symbol)` returns cached value.
+  - `_lookup_org()` kept as fallback when cache misses.
+  - Changed `fetch()` POST from `json_body={...}` to `data=urllib.parse.urlencode({...})` with headers `Content-Type: application/x-www-form-urlencoded`, `X-Requested-With: XMLHttpRequest`.
+  - Added `column` param: `szse` for SZSE, `sse` for SSE.
+  - Reduced `HARD_PAGE_LIMIT` from 200 to 20 (orgId-filtered results are targeted).
+- **Test update**: `_page_num_from_search()` now parses `kwargs["data"]` (form-encoded) via `urllib.parse.parse_qsl()`.
+
+### Fix 2: Eastmoney — announcement endpoint replacement
+
+- **Root cause**: `STOCK_SEARCH_URL` (`search-api-web.eastmoney.com/search/jsonp`) returned HTTP 400. Working endpoint: `https://np-anotice-stock.eastmoney.com/api/security/ann`.
+- **Fix**:
+  - Replaced `STOCK_SEARCH_URL` with `ANNOUNCEMENT_URL` with params: `sr=-1`, `page_size=50`, `page_index=N`, `ann_type=A`, `client_source=web`, `stock_list={code}`.
+  - Added `_parse_announcement_items()` and `_raw_item_from_announcement()` to parse `{"data":{"list":[...]}}` format with fields: `art_code`, `title`, `notice_date` (ms timestamp), `pdf_url`, `content`.
+  - 3-tier fallback: (1) announcement endpoint (paginated, stock-targeted), (2) keyword search with symbol, (3) keyword search with `query.keywords[0]`.
+  - `ANNOUNCEMENT_MAX_PAGES = 10`, `ANNOUNCEMENT_PAGE_SIZE = 50`.
+- **Test updates**: Added JSON announcement fixture. `test_eastmoney_parses_stock_news_fixture` now tests primary path with announcement JSON. `test_eastmoney_missing_date_records_warning` updated for 3-tier cascade. Category changed to `ANNOUNCEMENT` for announcement endpoint items.
+
+### Fix 3: CLS — title fallback
+
+- **Fix**: In `_parse_item`, when `title` is empty but `content` is present, use `content[:80]` as fallback title. Previously raised ValueError for missing title.
+
+### Live verification
+- **CNInfo**: 2 items for 300750 (2026-05-01 to 2026-05-12), orgId `GD165627` resolved from SZSE stock list cache (6189 entries).
+- **Eastmoney**: 500 items for 300750 (2026-05-01 to 2026-05-07), all stock-specific (宁德时代 announcements).
+- **CLS**: 40 items for recent 2-day window; no stock filtering (delegated to recall pipeline).
+- **Full test suite**: 63 passed, 4 skipped, 0 regressions. LSP diagnostics clean.
+
+## 2026-05-13 llama.cpp backend + tqdm progress bars
+
+### Evaluator: multi-backend support
+- Added `use_completions_api`, `strip_thinking`, `provider` parameters to `DeepSeekNewsEvaluator.__init__`.
+- `use_completions_api=True` switches from chat completions to `client.completions.create(prompt=..., model=...)` with no `response_format` or `extra_body`.
+- `strip_thinking=True` strips `<think>...</think>` tags via `re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)` before JSON parsing.
+- `provider` controls the prefix in `run_id` (e.g., `llama_cpp-{uuid}`) and `LLMRunRecord.provider`.
+- `_make_records`: parameters dict is conditional — omits `response_format`/`extra_body` when `use_completions_api=True`.
+- Retry on invalid JSON for completions mode: builds a new prompt string (`{prompt}\n\nPrevious response was not valid JSON.\n{REPAIR_PROMPT}`) instead of appending to `messages` list.
+- Classmethod factory `DeepSeekNewsEvaluator.for_llama_cpp(base_url, model, **kwargs)` sets `use_completions_api=True`, `strip_thinking=True`, `provider="llama_cpp"` as defaults, then lets `**kwargs` override.
+
+### Pipeline: tqdm progress bars
+- Added `from tqdm import tqdm` import.
+- Source fetch loop: `for vt_symbol in tqdm(symbols, desc=f"Fetching {source_enum.value}", unit="symbol")`.
+- Recall persistence: `for mapping in tqdm(mapped_news, desc="Persisting recall results", unit="item")`.
+- LLM evaluation loop: `for mapping in tqdm(mapped_news, desc="LLM evaluating", unit="item")`.
+
+### CLI: llama_cpp support
+- Added `--llm-provider` (choices: `deepseek`, `llama_cpp`, default: `deepseek`).
+- Added `--llm-base-url` (default: auto-detect from provider, `http://127.0.0.1:8080/v1` for llama_cpp).
+- Added `--llm-model` (override model name; defaults to `Qwen3.6-35B-A3B-Q4_K_M.gguf` for llama_cpp).
+- `_detect_llama_cpp_model(base_url)` queries the llama.cpp server's `/v1/models` endpoint via OpenAI client to auto-detect the loaded model when `--llm-model` is not specified.
+- When `--llm-provider llama_cpp`: uses `DeepSeekNewsEvaluator.for_llama_cpp()` factory instead of `DeepSeekNewsEvaluator()`.
+- DeepSeek path unchanged: still checks `DEEPSEEK_API_KEY` and uses default evaluator.
+
+### Tests added
+- `test_llama_cpp_completions_api`: Fake `FakeLlamaCppClient` with `completions.create()` endpoint. Verifies correct API (prompt, no `response_format`, no `extra_body`), JSON parsing succeeds, `provider="llama_cpp"`, parameters dict omits chat-only keys.
+- `test_llama_cpp_strips_thinking`: Payload has `<think>...</think>` prefix before valid JSON. Verifies think tag stripped from `raw_response`, output starts with `{`.
+
+### Verification
+- `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python -m pytest myQuant/news_ingestion/tests -q` → **65 passed, 4 skipped** (2 new tests, 0 regressions).
+- LSP diagnostics clean for all 4 modified files.
+- `tqdm` already installed in vnpy43 (v4.67.3).

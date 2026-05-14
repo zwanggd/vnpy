@@ -185,3 +185,95 @@ def test_missing_api_key_no_crash(monkeypatch: pytest.MonkeyPatch, mapped_news: 
     assert signal is not None
     assert run.status is Status.SUCCESS
     assert output.validation_status is Status.SUCCESS
+
+
+# ---------------------------------------------------------------------------
+# Fake classes for completions (llama.cpp) mode
+# ---------------------------------------------------------------------------
+
+
+class FakeCompletionChoice:
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+
+class FakeCompletionResponse:
+    def __init__(self, text: str) -> None:
+        self.choices = [FakeCompletionChoice(text)]
+        self.usage = FakeUsage()
+
+
+class FakeCompletionsEndpoint:
+    def __init__(self, outcomes: list[str | Exception]) -> None:
+        self.outcomes = outcomes
+        self.calls: list[dict[str, Any]] = []
+
+    def create(self, **kwargs: Any) -> FakeCompletionResponse:
+        self.calls.append(kwargs)
+        outcome = self.outcomes.pop(0)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return FakeCompletionResponse(outcome)
+
+
+class FakeLlamaCppClient:
+    def __init__(self, outcomes: list[str | Exception]) -> None:
+        self.completions = FakeCompletionsEndpoint(outcomes)
+
+
+# ---------------------------------------------------------------------------
+# llama.cpp tests
+# ---------------------------------------------------------------------------
+
+
+def test_llama_cpp_completions_api(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    client = FakeLlamaCppClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(
+        client=client,
+        model="Qwen3.6-35B-A3B-Q4_K_M.gguf",
+        use_completions_api=True,
+        strip_thinking=True,
+        provider="llama_cpp",
+    )
+
+    run, output, signal = evaluator.evaluate(mapped_news, news_item)
+
+    assert signal is not None
+    assert run.status is Status.SUCCESS
+    assert output.validation_status is Status.SUCCESS
+    assert signal.impact_direction is ImpactDirection.POSITIVE
+
+    # Verify completions API was called (not chat completions)
+    assert len(client.completions.calls) == 1
+    call = client.completions.calls[0]
+    assert call["model"] == "Qwen3.6-35B-A3B-Q4_K_M.gguf"
+    assert "max_tokens" in call
+    assert "temperature" in call
+    assert "prompt" in call
+    assert "response_format" not in call
+    assert call.get("extra_body", {}).get("chat_template_kwargs", {}).get("enable_thinking") is False
+
+    # Verify provider in run record
+    assert run.provider == "llama_cpp"
+    assert "response_format" not in run.parameters
+
+
+def test_llama_cpp_strips_thinking(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    think_payload = "<think>Let me analyze...\nThe news seems positive.</think>\n" + valid_payload()
+    client = FakeLlamaCppClient([think_payload])
+    evaluator = DeepSeekNewsEvaluator(
+        client=client,
+        model="Qwen3.6-35B-A3B-Q4_K_M.gguf",
+        use_completions_api=True,
+        strip_thinking=True,
+        provider="llama_cpp",
+    )
+
+    run, output, signal = evaluator.evaluate(mapped_news, news_item)
+
+    assert signal is not None
+    assert run.status is Status.SUCCESS
+    assert output.validation_status is Status.SUCCESS
+    # Verify think tag was stripped from raw response
+    assert "<think>" not in output.raw_response
+    assert output.raw_response.strip().startswith("{")
