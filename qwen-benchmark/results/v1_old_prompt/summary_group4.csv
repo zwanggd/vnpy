@@ -1,0 +1,3 @@
+config_id,total,success,success_rate_pct,avg_latency_ms,p50_latency_ms,p90_latency_ms,avg_ttft_ms,avg_output_tokens,throughput_req_s,labels,wall_time_s,ctx,workers,server_parallel
+g4_c4096,20,20,100.0,10153.0,9946.0,12252.0,915.0,105.0,0.1,"{""positive"": 3, ""neutral"": 14, ""negative"": 3}",203.1,4096,4,4
+g4_c8192,20,20,100.0,10826.0,10613.0,13881.0,938.0,110.0,0.09,"{""positive"": 5, ""neutral"": 12, ""negative"": 3}",216.5,8192,4,4

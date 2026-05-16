@@ -1,0 +1,704 @@
+Loaded: 20 exploratory items, 50 validation items
+
+############################################################
+### GROUP 1: Prompt / max_tokens ###
+############################################################
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: baseline_g1 ready (pid=46208)
+
+────────────────────────────────────────────────────────────
+Group 1 - A0 (max_tokens=160)
+  [G1 g1_A0] [ 1/20] w3 8923ms in=160 out=95 ttft=1570ms OK
+  [G1 g1_A0] [ 2/20] w2 8923ms in=153 out=95 ttft=1570ms OK
+  [G1 g1_A0] [ 3/20] w1 11206ms in=169 out=111 ttft=1571ms OK
+  [G1 g1_A0] [ 4/20] w0 12437ms in=156 out=120 ttft=1571ms OK
+  [G1 g1_A0] [ 5/20] w0 9650ms in=155 out=94 ttft=1252ms OK
+  [G1 g1_A0] [ 6/20] w2 8953ms in=157 out=91 ttft=746ms OK
+  [G1 g1_A0] [ 7/20] w1 12680ms in=153 out=119 ttft=1248ms OK
+  [G1 g1_A0] [ 8/20] w3 11942ms in=163 out=123 ttft=750ms OK
+  [G1 g1_A0] [ 9/20] w1 9883ms in=152 out=104 ttft=729ms OK
+  [G1 g1_A0] [10/20] w0 13437ms in=170 out=136 ttft=775ms OK
+  [G1 g1_A0] [11/20] w2 12064ms in=163 out=125 ttft=711ms OK
+  [G1 g1_A0] [12/20] w3 10267ms in=162 out=102 ttft=774ms OK
+  [G1 g1_A0] [13/20] w1 7962ms in=151 out=79 ttft=782ms OK
+  [G1 g1_A0] [14/20] w0 10004ms in=155 out=99 ttft=704ms OK
+  [G1 g1_A0] [15/20] w2 14741ms in=165 out=160 ttft=734ms OK
+  [G1 g1_A0] [16/20] w3 14730ms in=165 out=160 ttft=791ms FAIL
+  [G1 g1_A0] [17/20] w0 10820ms in=162 out=110 ttft=1180ms OK
+  [G1 g1_A0] [18/20] w1 10829ms in=165 out=110 ttft=1221ms OK
+  [G1 g1_A0] [19/20] w3 4814ms in=154 out=86 ttft=775ms OK
+  [G1 g1_A0] [20/20] w2 6447ms in=153 out=114 ttft=706ms OK
+  ───────────────────────────────────────────────────────
+  g1_A0: 19/20 OK (95.0%)
+  Latency: avg=10536ms p50=10820ms p90=14730ms  TTFT=1008ms
+  Output tokens: 109  Throughput: 0.09 req/s
+  Labels: {"positive": 4, "neutral": 11, "negative": 4}
+
+────────────────────────────────────────────────────────────
+Group 1 - A1 (max_tokens=96)
+  [G1 g1_A1] [ 1/20] w3 5050ms in=118 out=52 ttft=1281ms OK
+  [G1 g1_A1] [ 2/20] w0 5946ms in=114 out=58 ttft=1285ms OK
+  [G1 g1_A1] [ 3/20] w1 6488ms in=127 out=60 ttft=1283ms OK
+  [G1 g1_A1] [ 4/20] w2 8040ms in=111 out=73 ttft=1282ms OK
+  [G1 g1_A1] [ 5/20] w1 5236ms in=111 out=47 ttft=655ms OK
+  [G1 g1_A1] [ 6/20] w0 6889ms in=113 out=57 ttft=662ms OK
+  [G1 g1_A1] [ 7/20] w2 6365ms in=115 out=54 ttft=754ms OK
+  [G1 g1_A1] [ 8/20] w3 8432ms in=121 out=82 ttft=714ms OK
+  [G1 g1_A1] [ 9/20] w1 6386ms in=110 out=61 ttft=745ms OK
+  [G1 g1_A1] [10/20] w0 8716ms in=128 out=79 ttft=672ms OK
+  [G1 g1_A1] [11/20] w2 9533ms in=121 out=96 ttft=629ms OK
+  [G1 g1_A1] [12/20] w3 7228ms in=120 out=66 ttft=737ms OK
+  [G1 g1_A1] [13/20] w0 5454ms in=113 out=50 ttft=678ms OK
+  [G1 g1_A1] [14/20] w1 6524ms in=109 out=61 ttft=672ms OK
+  [G1 g1_A1] [15/20] w0 4869ms in=120 out=48 ttft=904ms OK
+  [G1 g1_A1] [16/20] w2 7130ms in=123 out=64 ttft=678ms OK
+  [G1 g1_A1] [17/20] w3 6757ms in=123 out=60 ttft=984ms OK
+  [G1 g1_A1] [18/20] w2 4415ms in=111 out=45 ttft=708ms OK
+  [G1 g1_A1] [19/20] w3 3813ms in=112 out=44 ttft=631ms OK
+  [G1 g1_A1] [20/20] w1 6910ms in=123 out=73 ttft=634ms OK
+  ───────────────────────────────────────────────────────
+  g1_A1: 20/20 OK (100.0%)
+  Latency: avg=6509ms p50=6524ms p90=8716ms  TTFT=829ms
+  Output tokens: 62  Throughput: 0.15 req/s
+  Labels: {"neutral": 19, "negative": 1}
+
+────────────────────────────────────────────────────────────
+Group 1 - A2 (max_tokens=48)
+  [G1 g1_A2] [ 1/20] w1 2193ms in=122 out=14 ttft=1232ms OK
+  [G1 g1_A2] [ 2/20] w0 2194ms in=109 out=14 ttft=1234ms OK
+  [G1 g1_A2] [ 3/20] w2 2192ms in=106 out=14 ttft=1232ms OK
+  [G1 g1_A2] [ 4/20] w3 2192ms in=113 out=14 ttft=1231ms OK
+  [G1 g1_A2] [ 5/20] w0 2064ms in=108 out=14 ttft=1100ms OK
+  [G1 g1_A2] [ 6/20] w2 2063ms in=110 out=14 ttft=1099ms OK
+  [G1 g1_A2] [ 7/20] w1 2064ms in=106 out=14 ttft=1100ms OK
+  [G1 g1_A2] [ 8/20] w3 2064ms in=116 out=14 ttft=1099ms OK
+  [G1 g1_A2] [ 9/20] w3 2521ms in=115 out=13 ttft=1631ms OK
+  [G1 g1_A2] [10/20] w2 2522ms in=116 out=14 ttft=1448ms OK
+  [G1 g1_A2] [11/20] w0 2564ms in=123 out=14 ttft=1633ms OK
+  [G1 g1_A2] [12/20] w1 2564ms in=105 out=14 ttft=1633ms OK
+  [G1 g1_A2] [13/20] w1 2186ms in=104 out=13 ttft=1270ms OK
+  [G1 g1_A2] [14/20] w2 2212ms in=118 out=14 ttft=1229ms OK
+  [G1 g1_A2] [15/20] w0 2254ms in=108 out=14 ttft=1271ms OK
+  [G1 g1_A2] [16/20] w3 2212ms in=118 out=14 ttft=1230ms OK
+  [G1 g1_A2] [17/20] w0 2374ms in=115 out=14 ttft=500ms OK
+  [G1 g1_A2] [18/20] w3 2364ms in=107 out=13 ttft=1475ms OK
+  [G1 g1_A2] [19/20] w2 2407ms in=106 out=14 ttft=1476ms OK
+  [G1 g1_A2] [20/20] w1 2408ms in=118 out=14 ttft=1477ms OK
+  ───────────────────────────────────────────────────────
+  g1_A2: 20/20 OK (100.0%)
+  Latency: avg=2281ms p50=2212ms p90=2564ms  TTFT=1280ms
+  Output tokens: 14  Throughput: 0.44 req/s
+  Labels: {"neutral": 16, "negative": 4}
+
+────────────────────────────────────────────────────────────
+Group 1 - A3 (max_tokens=80)
+  [G1 g1_A3] [ 1/20] w0 2854ms in=129 out=21 ttft=1316ms OK
+  [G1 g1_A3] [ 2/20] w1 3459ms in=142 out=23 ttft=1314ms OK
+  [G1 g1_A3] [ 3/20] w2 3468ms in=126 out=23 ttft=1314ms OK
+  [G1 g1_A3] [ 4/20] w3 3588ms in=133 out=24 ttft=1314ms OK
+  [G1 g1_A3] [ 5/20] w0 3628ms in=128 out=22 ttft=735ms OK
+  [G1 g1_A3] [ 6/20] w2 3104ms in=130 out=21 ttft=1513ms OK
+  [G1 g1_A3] [ 7/20] w3 3912ms in=136 out=23 ttft=1391ms OK
+  [G1 g1_A3] [ 8/20] w1 4099ms in=126 out=24 ttft=1520ms OK
+  [G1 g1_A3] [ 9/20] w1 3117ms in=125 out=21 ttft=930ms OK
+  [G1 g1_A3] [10/20] w0 3283ms in=143 out=22 ttft=1021ms OK
+  [G1 g1_A3] [11/20] w2 3282ms in=136 out=23 ttft=914ms OK
+  [G1 g1_A3] [12/20] w3 3224ms in=135 out=23 ttft=856ms OK
+  [G1 g1_A3] [13/20] w0 3131ms in=128 out=22 ttft=935ms OK
+  [G1 g1_A3] [14/20] w1 3114ms in=124 out=23 ttft=861ms OK
+  [G1 g1_A3] [15/20] w3 3115ms in=138 out=22 ttft=847ms OK
+  [G1 g1_A3] [16/20] w2 3117ms in=138 out=22 ttft=848ms OK
+  [G1 g1_A3] [17/20] w1 3109ms in=138 out=23 ttft=871ms OK
+  [G1 g1_A3] [18/20] w0 3224ms in=135 out=24 ttft=928ms OK
+  [G1 g1_A3] [19/20] w2 2343ms in=126 out=24 ttft=819ms OK
+  [G1 g1_A3] [20/20] w3 2343ms in=127 out=24 ttft=819ms OK
+  ───────────────────────────────────────────────────────
+  g1_A3: 20/20 OK (100.0%)
+  Latency: avg=3226ms p50=3224ms p90=3912ms  TTFT=1053ms
+  Output tokens: 23  Throughput: 0.31 req/s
+  Labels: {"neutral": 18, "negative": 2}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_group1.csv
+
+############################################################
+### GROUP 2: Client Workers ###
+############################################################
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: baseline_g2 ready (pid=46318)
+
+────────────────────────────────────────────────────────────
+Group 2 - workers=1
+  [G2 g2_w1] [ 1/20] w0 4110ms in=156 out=120 ttft=517ms OK
+  [G2 g2_w1] [ 2/20] w0 3914ms in=169 out=111 ttft=570ms OK
+  [G2 g2_w1] [ 3/20] w0 2938ms in=153 out=86 ttft=525ms OK
+  [G2 g2_w1] [ 4/20] w0 3220ms in=160 out=97 ttft=495ms OK
+  [G2 g2_w1] [ 5/20] w0 2998ms in=155 out=84 ttft=499ms OK
+  [G2 g2_w1] [ 6/20] w0 3875ms in=153 out=119 ttft=522ms OK
+  [G2 g2_w1] [ 7/20] w0 3939ms in=157 out=116 ttft=495ms OK
+  [G2 g2_w1] [ 8/20] w0 3960ms in=163 out=116 ttft=521ms OK
+  [G2 g2_w1] [ 9/20] w0 4596ms in=170 out=136 ttft=547ms OK
+  [G2 g2_w1] [10/20] w0 3786ms in=152 out=116 ttft=517ms OK
+  [G2 g2_w1] [11/20] w0 4573ms in=163 out=137 ttft=503ms OK
+  [G2 g2_w1] [12/20] w0 3403ms in=162 out=97 ttft=541ms OK
+  [G2 g2_w1] [13/20] w0 3207ms in=155 out=96 ttft=508ms OK
+  [G2 g2_w1] [14/20] w0 3217ms in=151 out=97 ttft=496ms OK
+  [G2 g2_w1] [15/20] w0 5103ms in=165 out=155 ttft=524ms OK
+  [G2 g2_w1] [16/20] w0 3700ms in=165 out=104 ttft=563ms OK
+  [G2 g2_w1] [17/20] w0 3919ms in=162 out=112 ttft=537ms OK
+  [G2 g2_w1] [18/20] w0 3686ms in=165 out=107 ttft=558ms OK
+  [G2 g2_w1] [19/20] w0 4016ms in=153 out=114 ttft=529ms OK
+  [G2 g2_w1] [20/20] w0 3762ms in=154 out=105 ttft=522ms OK
+  ───────────────────────────────────────────────────────
+  g2_w1: 20/20 OK (100.0%)
+  Latency: avg=3796ms p50=3875ms p90=4596ms  TTFT=524ms
+  Output tokens: 111  Throughput: 0.26 req/s
+  Labels: {"positive": 3, "neutral": 14, "negative": 3}
+
+────────────────────────────────────────────────────────────
+Group 2 - workers=4
+  [G2 g2_w4] [ 1/20] w3 8632ms in=160 out=95 ttft=1447ms OK
+  [G2 g2_w4] [ 2/20] w2 8633ms in=153 out=95 ttft=1448ms OK
+  [G2 g2_w4] [ 3/20] w1 10417ms in=169 out=111 ttft=1273ms OK
+  [G2 g2_w4] [ 4/20] w0 11681ms in=156 out=120 ttft=1451ms OK
+  [G2 g2_w4] [ 5/20] w0 8264ms in=155 out=84 ttft=864ms OK
+  [G2 g2_w4] [ 6/20] w2 7761ms in=157 out=84 ttft=716ms OK
+  [G2 g2_w4] [ 7/20] w1 11115ms in=153 out=117 ttft=863ms OK
+  [G2 g2_w4] [ 8/20] w3 11186ms in=163 out=130 ttft=689ms OK
+  [G2 g2_w4] [ 9/20] w1 9106ms in=152 out=104 ttft=233ms OK
+  [G2 g2_w4] [10/20] w0 11826ms in=170 out=136 ttft=217ms OK
+  [G2 g2_w4] [11/20] w2 11156ms in=163 out=129 ttft=210ms OK
+  [G2 g2_w4] [12/20] w3 9081ms in=162 out=102 ttft=724ms OK
+  [G2 g2_w4] [13/20] w1 7050ms in=151 out=79 ttft=248ms OK
+  [G2 g2_w4] [14/20] w0 8816ms in=155 out=99 ttft=239ms OK
+  [G2 g2_w4] [15/20] w3 9681ms in=165 out=111 ttft=721ms OK
+  [G2 g2_w4] [16/20] w1 7972ms in=165 out=97 ttft=233ms OK
+  [G2 g2_w4] [17/20] w2 14086ms in=165 out=159 ttft=216ms OK
+  [G2 g2_w4] [18/20] w0 9404ms in=162 out=108 ttft=240ms OK
+  [G2 g2_w4] [19/20] w2 7076ms in=153 out=119 ttft=197ms OK
+  [G2 g2_w4] [20/20] w3 5222ms in=154 out=107 ttft=751ms OK
+  ───────────────────────────────────────────────────────
+  g2_w4: 20/20 OK (100.0%)
+  Latency: avg=9408ms p50=9106ms p90=11826ms  TTFT=649ms
+  Output tokens: 109  Throughput: 0.11 req/s
+  Labels: {"positive": 3, "neutral": 14, "negative": 3}
+
+────────────────────────────────────────────────────────────
+Group 2 - workers=6
+  [G2 g2_w6] [ 1/20] w0 7353ms in=156 out=85 ttft=876ms OK
+  [G2 g2_w6] [ 2/20] w2 7581ms in=153 out=86 ttft=1028ms OK
+  [G2 g2_w6] [ 3/20] w3 8374ms in=160 out=95 ttft=1026ms OK
+  [G2 g2_w6] [ 4/20] w5 10396ms in=153 out=115 ttft=869ms OK
+  [G2 g2_w6] [ 5/20] w4 15417ms in=155 out=85 ttft=7721ms OK
+  [G2 g2_w6] [ 6/20] w0 8858ms in=157 out=84 ttft=1684ms OK
+  [G2 g2_w6] [ 7/20] w1 17458ms in=169 out=111 ttft=7498ms OK
+  [G2 g2_w6] [ 8/20] w1 13918ms in=163 out=130 ttft=3472ms OK
+  [G2 g2_w6] [ 9/20] w3 14720ms in=152 out=104 ttft=5949ms OK
+  [G2 g2_w6] [10/20] w2 18654ms in=170 out=136 ttft=7197ms OK
+  [G2 g2_w6] [11/20] w4 13046ms in=163 out=129 ttft=2179ms OK
+  [G2 g2_w6] [12/20] w5 14231ms in=162 out=102 ttft=5951ms OK
+  [G2 g2_w6] [13/20] w0 16286ms in=155 out=99 ttft=7812ms OK
+  [G2 g2_w6] [14/20] w1 12552ms in=151 out=79 ttft=5684ms OK
+  [G2 g2_w6] [15/20] w3 13183ms in=165 out=113 ttft=4078ms OK
+  [G2 g2_w6] [16/20] w2 16682ms in=165 out=157 ttft=3485ms OK
+  [G2 g2_w6] [17/20] w5 11994ms in=165 out=97 ttft=3757ms OK
+  [G2 g2_w6] [18/20] w4 14829ms in=162 out=111 ttft=5419ms OK
+  [G2 g2_w6] [19/20] w0 14800ms in=153 out=114 ttft=6612ms OK
+  [G2 g2_w6] [20/20] w1 14869ms in=154 out=106 ttft=8381ms OK
+  ───────────────────────────────────────────────────────
+  g2_w6: 20/20 OK (100.0%)
+  Latency: avg=13260ms p50=14231ms p90=17458ms  TTFT=4534ms
+  Output tokens: 107  Throughput: 0.08 req/s
+  Labels: {"positive": 3, "neutral": 14, "negative": 3}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_group2.csv
+
+############################################################
+### GROUP 3: Server Parallel ###
+############################################################
+
+############################################################
+Group 3 - server parallel=1, workers=1
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g3_p1 ready (pid=46389)
+  [G3 g3_p1] [ 1/20] w0 4162ms in=156 out=120 ttft=530ms OK
+  [G3 g3_p1] [ 2/20] w0 3934ms in=169 out=111 ttft=551ms OK
+  [G3 g3_p1] [ 3/20] w0 3104ms in=153 out=86 ttft=539ms OK
+  [G3 g3_p1] [ 4/20] w0 3434ms in=160 out=97 ttft=534ms OK
+  [G3 g3_p1] [ 5/20] w0 3046ms in=155 out=84 ttft=529ms OK
+  [G3 g3_p1] [ 6/20] w0 4092ms in=153 out=119 ttft=524ms OK
+  [G3 g3_p1] [ 7/20] w0 4229ms in=157 out=116 ttft=533ms OK
+  [G3 g3_p1] [ 8/20] w0 3984ms in=163 out=116 ttft=536ms OK
+  [G3 g3_p1] [ 9/20] w0 4670ms in=170 out=136 ttft=555ms OK
+  [G3 g3_p1] [10/20] w0 4006ms in=152 out=116 ttft=530ms OK
+  [G3 g3_p1] [11/20] w0 4673ms in=163 out=137 ttft=538ms OK
+  [G3 g3_p1] [12/20] w0 3469ms in=162 out=97 ttft=536ms OK
+  [G3 g3_p1] [13/20] w0 3419ms in=155 out=96 ttft=524ms OK
+  [G3 g3_p1] [14/20] w0 3423ms in=151 out=97 ttft=526ms OK
+  [G3 g3_p1] [15/20] w0 5290ms in=165 out=155 ttft=565ms OK
+  [G3 g3_p1] [16/20] w0 3681ms in=165 out=104 ttft=556ms OK
+  [G3 g3_p1] [17/20] w0 3948ms in=162 out=112 ttft=524ms OK
+  [G3 g3_p1] [18/20] w0 3877ms in=165 out=107 ttft=576ms OK
+  [G3 g3_p1] [19/20] w0 4054ms in=153 out=114 ttft=540ms OK
+  [G3 g3_p1] [20/20] w0 3714ms in=154 out=105 ttft=517ms OK
+  ───────────────────────────────────────────────────────
+  g3_p1: 20/20 OK (100.0%)
+  Latency: avg=3910ms p50=3948ms p90=4673ms  TTFT=538ms
+  Output tokens: 111  Throughput: 0.26 req/s
+  Labels: {"positive": 3, "neutral": 14, "negative": 3}
+
+############################################################
+Group 3 - server parallel=4, workers=4
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g3_p4 ready (pid=46450)
+  [G3 g3_p4] [ 1/20] w3 8996ms in=160 out=95 ttft=1488ms OK
+  [G3 g3_p4] [ 2/20] w2 8997ms in=153 out=95 ttft=1487ms OK
+  [G3 g3_p4] [ 3/20] w1 11253ms in=169 out=111 ttft=1490ms OK
+  [G3 g3_p4] [ 4/20] w0 12494ms in=156 out=120 ttft=1490ms OK
+  [G3 g3_p4] [ 5/20] w0 8928ms in=155 out=84 ttft=1214ms OK
+  [G3 g3_p4] [ 6/20] w1 10397ms in=153 out=96 ttft=1212ms OK
+  [G3 g3_p4] [ 7/20] w2 9532ms in=157 out=91 ttft=740ms OK
+  [G3 g3_p4] [ 8/20] w3 12825ms in=163 out=133 ttft=763ms OK
+  [G3 g3_p4] [ 9/20] w1 9953ms in=152 out=104 ttft=758ms OK
+  [G3 g3_p4] [10/20] w0 13437ms in=170 out=135 ttft=737ms OK
+  [G3 g3_p4] [11/20] w2 13597ms in=163 out=144 ttft=714ms OK
+  [G3 g3_p4] [12/20] w3 10281ms in=162 out=102 ttft=772ms OK
+  [G3 g3_p4] [13/20] w0 9777ms in=155 out=96 ttft=734ms OK
+  [G3 g3_p4] [14/20] w1 8364ms in=151 out=79 ttft=694ms OK
+  [G3 g3_p4] [15/20] w1 8383ms in=165 out=97 ttft=781ms OK
+  [G3 g3_p4] [16/20] w2 14918ms in=165 out=155 ttft=729ms OK
+  [G3 g3_p4] [17/20] w0 10891ms in=162 out=111 ttft=725ms OK
+  [G3 g3_p4] [18/20] w3 15110ms in=165 out=158 ttft=762ms OK
+  [G3 g3_p4] [19/20] w3 7347ms in=154 out=102 ttft=718ms OK
+  [G3 g3_p4] [20/20] w2 8632ms in=153 out=114 ttft=703ms OK
+  ───────────────────────────────────────────────────────
+  g3_p4: 20/20 OK (100.0%)
+  Latency: avg=10706ms p50=10281ms p90=14918ms  TTFT=935ms
+  Output tokens: 111  Throughput: 0.09 req/s
+  Labels: {"positive": 3, "neutral": 13, "negative": 4}
+
+############################################################
+Group 3 - server parallel=6, workers=6
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g3_p6 ready (pid=46479)
+  [G3 g3_p6] [ 1/20] w4 10332ms in=155 out=80 ttft=1922ms OK
+  [G3 g3_p6] [ 2/20] w2 12422ms in=153 out=95 ttft=1925ms OK
+  [G3 g3_p6] [ 3/20] w3 12521ms in=160 out=96 ttft=1924ms OK
+  [G3 g3_p6] [ 4/20] w1 14941ms in=169 out=111 ttft=1926ms OK
+  [G3 g3_p6] [ 5/20] w0 16357ms in=156 out=120 ttft=1929ms OK
+  [G3 g3_p6] [ 6/20] w5 17138ms in=153 out=123 ttft=1922ms OK
+  [G3 g3_p6] [ 7/20] w0 11887ms in=157 out=84 ttft=807ms OK
+  [G3 g3_p6] [ 8/20] w1 15838ms in=163 out=121 ttft=1116ms OK
+  [G3 g3_p6] [ 9/20] w5 12555ms in=162 out=102 ttft=799ms OK
+  [G3 g3_p6] [10/20] w3 15878ms in=152 out=120 ttft=764ms OK
+  [G3 g3_p6] [11/20] w2 18296ms in=170 out=136 ttft=1016ms OK
+  [G3 g3_p6] [12/20] w4 17332ms in=163 out=129 ttft=788ms OK
+  [G3 g3_p6] [13/20] w0 13328ms in=155 out=96 ttft=798ms OK
+  [G3 g3_p6] [14/20] w1 11620ms in=151 out=79 ttft=791ms OK
+  [G3 g3_p6] [15/20] w2 14487ms in=165 out=104 ttft=797ms OK
+  [G3 g3_p6] [16/20] w3 13801ms in=165 out=102 ttft=1264ms OK
+  [G3 g3_p6] [17/20] w4 14671ms in=162 out=111 ttft=1264ms OK
+  [G3 g3_p6] [18/20] w5 12273ms in=165 out=98 ttft=785ms OK
+  [G3 g3_p6] [19/20] w0 11108ms in=153 out=96 ttft=800ms OK
+  [G3 g3_p6] [20/20] w1 7443ms in=154 out=83 ttft=844ms OK
+  ───────────────────────────────────────────────────────
+  g3_p6: 20/20 OK (100.0%)
+  Latency: avg=13711ms p50=13801ms p90=17332ms  TTFT=1209ms
+  Output tokens: 104  Throughput: 0.07 req/s
+  Labels: {"positive": 4, "neutral": 13, "negative": 3}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_group3.csv
+
+############################################################
+### GROUP 4: Context Size ###
+############################################################
+
+############################################################
+Group 4 - ctx=4096
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g4_c4096 ready (pid=46502)
+  [G4 g4_c4096] [ 1/20] w2 8547ms in=153 out=95 ttft=1439ms OK
+  [G4 g4_c4096] [ 2/20] w3 8618ms in=160 out=96 ttft=1439ms OK
+  [G4 g4_c4096] [ 3/20] w1 10706ms in=169 out=111 ttft=1441ms OK
+  [G4 g4_c4096] [ 4/20] w0 11902ms in=156 out=120 ttft=1442ms OK
+  [G4 g4_c4096] [ 5/20] w1 9604ms in=153 out=96 ttft=1104ms OK
+  [G4 g4_c4096] [ 6/20] w0 10505ms in=155 out=99 ttft=1175ms OK
+  [G4 g4_c4096] [ 7/20] w2 9334ms in=157 out=89 ttft=724ms OK
+  [G4 g4_c4096] [ 8/20] w3 11864ms in=163 out=121 ttft=722ms OK
+  [G4 g4_c4096] [ 9/20] w1 9826ms in=152 out=104 ttft=748ms OK
+  [G4 g4_c4096] [10/20] w0 13357ms in=170 out=135 ttft=831ms OK
+  [G4 g4_c4096] [11/20] w2 12252ms in=163 out=129 ttft=740ms OK
+  [G4 g4_c4096] [12/20] w3 9765ms in=162 out=97 ttft=699ms OK
+  [G4 g4_c4096] [13/20] w0 9946ms in=155 out=99 ttft=725ms OK
+  [G4 g4_c4096] [14/20] w1 8373ms in=151 out=79 ttft=711ms OK
+  [G4 g4_c4096] [15/20] w2 10372ms in=165 out=104 ttft=755ms OK
+  [G4 g4_c4096] [16/20] w3 10201ms in=165 out=102 ttft=732ms OK
+  [G4 g4_c4096] [17/20] w1 9287ms in=165 out=97 ttft=724ms OK
+  [G4 g4_c4096] [18/20] w0 10780ms in=162 out=111 ttft=732ms OK
+  [G4 g4_c4096] [19/20] w3 8336ms in=154 out=107 ttft=679ms OK
+  [G4 g4_c4096] [20/20] w2 9490ms in=153 out=117 ttft=741ms OK
+  ───────────────────────────────────────────────────────
+  g4_c4096: 20/20 OK (100.0%)
+  Latency: avg=10153ms p50=9946ms p90=12252ms  TTFT=915ms
+  Output tokens: 105  Throughput: 0.10 req/s
+  Labels: {"positive": 3, "neutral": 14, "negative": 3}
+
+############################################################
+Group 4 - ctx=8192
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 8192 -ngl ...
+  SERVER: g4_c8192 ready (pid=46532)
+  [G4 g4_c8192] [ 1/20] w2 8793ms in=153 out=95 ttft=1464ms OK
+  [G4 g4_c8192] [ 2/20] w3 8796ms in=160 out=95 ttft=1462ms OK
+  [G4 g4_c8192] [ 3/20] w1 11066ms in=169 out=111 ttft=1463ms OK
+  [G4 g4_c8192] [ 4/20] w0 12354ms in=156 out=120 ttft=1466ms OK
+  [G4 g4_c8192] [ 5/20] w0 9943ms in=155 out=94 ttft=1203ms OK
+  [G4 g4_c8192] [ 6/20] w2 8734ms in=157 out=84 ttft=789ms OK
+  [G4 g4_c8192] [ 7/20] w1 12948ms in=153 out=117 ttft=1198ms OK
+  [G4 g4_c8192] [ 8/20] w3 13016ms in=163 out=130 ttft=744ms OK
+  [G4 g4_c8192] [ 9/20] w1 10219ms in=152 out=104 ttft=773ms OK
+  [G4 g4_c8192] [10/20] w0 13881ms in=170 out=136 ttft=802ms OK
+  [G4 g4_c8192] [11/20] w2 12682ms in=163 out=129 ttft=723ms OK
+  [G4 g4_c8192] [12/20] w3 10449ms in=162 out=102 ttft=769ms OK
+  [G4 g4_c8192] [13/20] w0 10126ms in=155 out=99 ttft=743ms OK
+  [G4 g4_c8192] [14/20] w1 8533ms in=151 out=79 ttft=753ms OK
+  [G4 g4_c8192] [15/20] w3 10613ms in=165 out=111 ttft=737ms OK
+  [G4 g4_c8192] [16/20] w2 15383ms in=165 out=158 ttft=728ms OK
+  [G4 g4_c8192] [17/20] w0 11016ms in=162 out=110 ttft=749ms OK
+  [G4 g4_c8192] [18/20] w1 11670ms in=165 out=125 ttft=771ms OK
+  [G4 g4_c8192] [19/20] w2 9773ms in=153 out=118 ttft=726ms OK
+  [G4 g4_c8192] [20/20] w3 6516ms in=154 out=86 ttft=700ms OK
+  ───────────────────────────────────────────────────────
+  g4_c8192: 20/20 OK (100.0%)
+  Latency: avg=10826ms p50=10613ms p90=13881ms  TTFT=938ms
+  Output tokens: 110  Throughput: 0.09 req/s
+  Labels: {"positive": 5, "neutral": 12, "negative": 3}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_group4.csv
+
+############################################################
+### GROUP 5: Batch / Ubatch ###
+############################################################
+
+############################################################
+Group 5 - batch=512 ubatch=512
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g5_b512_ub512 ready (pid=46559)
+  [G5 g5_b512_ub512] [ 1/20] w3 9013ms in=160 out=92 ttft=1756ms OK
+  [G5 g5_b512_ub512] [ 2/20] w2 9712ms in=153 out=95 ttft=1758ms OK
+  [G5 g5_b512_ub512] [ 3/20] w0 10463ms in=156 out=97 ttft=1892ms OK
+  [G5 g5_b512_ub512] [ 4/20] w1 11880ms in=169 out=111 ttft=1760ms OK
+  [G5 g5_b512_ub512] [ 5/20] w0 8513ms in=155 out=84 ttft=697ms OK
+  [G5 g5_b512_ub512] [ 6/20] w2 7990ms in=157 out=84 ttft=652ms OK
+  [G5 g5_b512_ub512] [ 7/20] w1 9812ms in=153 out=96 ttft=747ms OK
+  [G5 g5_b512_ub512] [ 8/20] w3 12221ms in=163 out=133 ttft=724ms OK
+  [G5 g5_b512_ub512] [ 9/20] w1 9524ms in=152 out=104 ttft=613ms OK
+  [G5 g5_b512_ub512] [10/20] w0 12763ms in=170 out=135 ttft=687ms OK
+  [G5 g5_b512_ub512] [11/20] w2 12504ms in=163 out=137 ttft=715ms OK
+  [G5 g5_b512_ub512] [12/20] w3 9807ms in=162 out=102 ttft=729ms OK
+  [G5 g5_b512_ub512] [13/20] w0 9360ms in=155 out=96 ttft=612ms OK
+  [G5 g5_b512_ub512] [14/20] w1 8050ms in=151 out=79 ttft=658ms OK
+  [G5 g5_b512_ub512] [15/20] w2 10016ms in=165 out=104 ttft=721ms OK
+  [G5 g5_b512_ub512] [16/20] w1 8411ms in=165 out=95 ttft=692ms OK
+  [G5 g5_b512_ub512] [17/20] w0 10319ms in=162 out=110 ttft=619ms OK
+  [G5 g5_b512_ub512] [18/20] w3 14442ms in=165 out=160 ttft=727ms FAIL
+  [G5 g5_b512_ub512] [19/20] w2 7324ms in=153 out=96 ttft=716ms OK
+  [G5 g5_b512_ub512] [20/20] w3 4221ms in=154 out=94 ttft=590ms OK
+  ───────────────────────────────────────────────────────
+  g5_b512_ub512: 19/20 OK (95.0%)
+  Latency: avg=9817ms p50=9807ms p90=12763ms  TTFT=903ms
+  Output tokens: 102  Throughput: 0.10 req/s
+  Labels: {"positive": 3, "neutral": 12, "negative": 4}
+
+############################################################
+Group 5 - batch=1024 ubatch=1024
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g5_b1024_ub1024 ready (pid=46585)
+  [G5 g5_b1024_ub1024] [ 1/20] w3 8699ms in=160 out=92 ttft=1468ms OK
+  [G5 g5_b1024_ub1024] [ 2/20] w2 9424ms in=153 out=95 ttft=1469ms OK
+  [G5 g5_b1024_ub1024] [ 3/20] w1 11226ms in=169 out=111 ttft=1469ms OK
+  [G5 g5_b1024_ub1024] [ 4/20] w0 12429ms in=156 out=120 ttft=1473ms OK
+  [G5 g5_b1024_ub1024] [ 5/20] w0 8912ms in=155 out=84 ttft=724ms OK
+  [G5 g5_b1024_ub1024] [ 6/20] w1 9900ms in=153 out=96 ttft=754ms OK
+  [G5 g5_b1024_ub1024] [ 7/20] w2 11731ms in=157 out=119 ttft=714ms OK
+  [G5 g5_b1024_ub1024] [ 8/20] w3 12685ms in=163 out=131 ttft=749ms OK
+  [G5 g5_b1024_ub1024] [ 9/20] w1 10006ms in=152 out=104 ttft=745ms OK
+  [G5 g5_b1024_ub1024] [10/20] w0 13512ms in=170 out=135 ttft=754ms OK
+  [G5 g5_b1024_ub1024] [11/20] w3 9833ms in=162 out=102 ttft=771ms OK
+  [G5 g5_b1024_ub1024] [12/20] w2 13002ms in=163 out=129 ttft=707ms OK
+  [G5 g5_b1024_ub1024] [13/20] w1 7976ms in=151 out=79 ttft=705ms OK
+  [G5 g5_b1024_ub1024] [14/20] w0 9841ms in=155 out=96 ttft=756ms OK
+  [G5 g5_b1024_ub1024] [15/20] w2 10496ms in=165 out=104 ttft=765ms OK
+  [G5 g5_b1024_ub1024] [16/20] w3 10324ms in=165 out=102 ttft=734ms OK
+  [G5 g5_b1024_ub1024] [17/20] w0 10887ms in=162 out=110 ttft=1184ms OK
+  [G5 g5_b1024_ub1024] [18/20] w1 11840ms in=165 out=122 ttft=1244ms OK
+  [G5 g5_b1024_ub1024] [19/20] w2 7299ms in=153 out=96 ttft=753ms OK
+  [G5 g5_b1024_ub1024] [20/20] w3 6529ms in=154 out=94 ttft=700ms OK
+  ───────────────────────────────────────────────────────
+  g5_b1024_ub1024: 20/20 OK (100.0%)
+  Latency: avg=10327ms p50=10324ms p90=13002ms  TTFT=932ms
+  Output tokens: 106  Throughput: 0.10 req/s
+  Labels: {"positive": 3, "neutral": 13, "negative": 4}
+
+############################################################
+Group 5 - batch=2048 ubatch=2048
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: g5_b2048_ub2048 ready (pid=46611)
+  [G5 g5_b2048_ub2048] [ 1/20] w3 8629ms in=160 out=95 ttft=1455ms OK
+  [G5 g5_b2048_ub2048] [ 2/20] w2 8631ms in=153 out=95 ttft=1456ms OK
+  [G5 g5_b2048_ub2048] [ 3/20] w1 10777ms in=169 out=111 ttft=1458ms OK
+  [G5 g5_b2048_ub2048] [ 4/20] w0 11938ms in=156 out=120 ttft=1459ms OK
+  [G5 g5_b2048_ub2048] [ 5/20] w0 8488ms in=155 out=84 ttft=1154ms OK
+  [G5 g5_b2048_ub2048] [ 6/20] w1 9885ms in=153 out=96 ttft=1154ms OK
+  [G5 g5_b2048_ub2048] [ 7/20] w2 9062ms in=157 out=91 ttft=693ms OK
+  [G5 g5_b2048_ub2048] [ 8/20] w3 12294ms in=163 out=133 ttft=713ms OK
+  [G5 g5_b2048_ub2048] [ 9/20] w1 9668ms in=152 out=104 ttft=706ms OK
+  [G5 g5_b2048_ub2048] [10/20] w0 13099ms in=170 out=135 ttft=693ms OK
+  [G5 g5_b2048_ub2048] [11/20] w2 13420ms in=163 out=144 ttft=689ms OK
+  [G5 g5_b2048_ub2048] [12/20] w3 10254ms in=162 out=102 ttft=726ms OK
+  [G5 g5_b2048_ub2048] [13/20] w0 9882ms in=155 out=96 ttft=754ms OK
+  [G5 g5_b2048_ub2048] [14/20] w1 8460ms in=151 out=79 ttft=694ms OK
+  [G5 g5_b2048_ub2048] [15/20] w1 8499ms in=165 out=97 ttft=786ms OK
+  [G5 g5_b2048_ub2048] [16/20] w2 15113ms in=165 out=155 ttft=733ms OK
+  [G5 g5_b2048_ub2048] [17/20] w0 11023ms in=162 out=111 ttft=735ms OK
+  [G5 g5_b2048_ub2048] [18/20] w3 15311ms in=165 out=158 ttft=762ms OK
+  [G5 g5_b2048_ub2048] [19/20] w3 7395ms in=154 out=102 ttft=718ms OK
+  [G5 g5_b2048_ub2048] [20/20] w2 8686ms in=153 out=114 ttft=703ms OK
+  ───────────────────────────────────────────────────────
+  g5_b2048_ub2048: 20/20 OK (100.0%)
+  Latency: avg=10526ms p50=9885ms p90=15113ms  TTFT=912ms
+  Output tokens: 111  Throughput: 0.10 req/s
+  Labels: {"positive": 3, "neutral": 13, "negative": 4}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_group5.csv
+
+============================================================
+PHASE 1 COMPLETE in 851s (14.2m)
+============================================================
+
+Config                            OK%      Avg      P50      P90     TTFT  OutTk   Req/s Labels
+--------------------------------------------------------------------------------------------------------------
+g1_A0                             95%    10536    10820    14730     1008    109    0.09 {"positive": 4, "neutral": 11, "negative": 4}
+g1_A1                            100%     6509     6524     8716      829     62    0.15 {"neutral": 19, "negative": 1}
+g1_A2                            100%     2281     2212     2564     1280     14    0.44 {"neutral": 16, "negative": 4}
+g1_A3                            100%     3226     3224     3912     1053     23    0.31 {"neutral": 18, "negative": 2}
+g2_w1                            100%     3796     3875     4596      524    111    0.26 {"positive": 3, "neutral": 14, "negative": 3}
+g2_w4                            100%     9408     9106    11826      649    109    0.11 {"positive": 3, "neutral": 14, "negative": 3}
+g2_w6                            100%    13260    14231    17458     4534    107    0.08 {"positive": 3, "neutral": 14, "negative": 3}
+g3_p1                            100%     3910     3948     4673      538    111    0.26 {"positive": 3, "neutral": 14, "negative": 3}
+g3_p4                            100%    10706    10281    14918      935    111    0.09 {"positive": 3, "neutral": 13, "negative": 4}
+g3_p6                            100%    13711    13801    17332     1209    104    0.07 {"positive": 4, "neutral": 13, "negative": 3}
+g4_c4096                         100%    10153     9946    12252      915    105    0.10 {"positive": 3, "neutral": 14, "negative": 3}
+g4_c8192                         100%    10826    10613    13881      938    110    0.09 {"positive": 5, "neutral": 12, "negative": 3}
+g5_b512_ub512                     95%     9817     9807    12763      903    102    0.10 {"positive": 3, "neutral": 12, "negative": 4}
+g5_b1024_ub1024                  100%    10327    10324    13002      932    106    0.10 {"positive": 3, "neutral": 13, "negative": 4}
+g5_b2048_ub2048                  100%    10526     9885    15113      912    111    0.10 {"positive": 3, "neutral": 13, "negative": 4}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_phase1_all.csv
+
+============================================================
+BEST EXPLORATORY CONFIG: g1_A2
+  Success: 100.0%  Throughput: 0.44 req/s
+  Avg latency: 2281.0ms  TTFT: 1280.0ms
+============================================================
+
+############################################################
+VALIDATION - Baseline (50 items × 1 run)
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: val_baseline ready (pid=46789)
+  [VAL val_baseline] [ 1/50] w1 2213ms in=122 out=14 ttft=1201ms OK
+  [VAL val_baseline] [ 2/50] w3 2211ms in=113 out=14 ttft=1200ms OK
+  [VAL val_baseline] [ 3/50] w2 2214ms in=106 out=14 ttft=1202ms OK
+  [VAL val_baseline] [ 4/50] w0 2219ms in=109 out=14 ttft=1206ms OK
+  [VAL val_baseline] [ 5/50] w1 2181ms in=106 out=14 ttft=1165ms OK
+  [VAL val_baseline] [ 6/50] w0 2183ms in=108 out=14 ttft=1164ms OK
+  [VAL val_baseline] [ 8/50] w3 2180ms in=116 out=14 ttft=1162ms OK
+  [VAL val_baseline] [ 7/50] w2 2181ms in=110 out=14 ttft=1163ms OK
+  [VAL val_baseline] [ 9/50] w0 2620ms in=123 out=14 ttft=1474ms OK
+  [VAL val_baseline] [10/50] w3 2613ms in=115 out=13 ttft=1667ms OK
+  [VAL val_baseline] [11/50] w2 2665ms in=116 out=14 ttft=1670ms OK
+  [VAL val_baseline] [12/50] w1 2668ms in=105 out=14 ttft=1674ms OK
+  [VAL val_baseline] [13/50] w0 2077ms in=108 out=13 ttft=1188ms OK
+  [VAL val_baseline] [14/50] w1 2075ms in=104 out=13 ttft=1187ms OK
+  [VAL val_baseline] [15/50] w3 2068ms in=118 out=14 ttft=1138ms OK
+  [VAL val_baseline] [16/50] w2 2069ms in=118 out=14 ttft=1139ms OK
+  [VAL val_baseline] [17/50] w0 2260ms in=115 out=14 ttft=1222ms OK
+  [VAL val_baseline] [18/50] w1 2260ms in=118 out=14 ttft=1222ms OK
+  [VAL val_baseline] [19/50] w3 2219ms in=107 out=13 ttft=1324ms OK
+  [VAL val_baseline] [20/50] w2 2250ms in=106 out=14 ttft=1325ms OK
+  [VAL val_baseline] [21/50] w2 2279ms in=112 out=14 ttft=1268ms OK
+  [VAL val_baseline] [22/50] w0 2281ms in=111 out=14 ttft=1269ms OK
+  [VAL val_baseline] [23/50] w1 2280ms in=106 out=14 ttft=1268ms OK
+  [VAL val_baseline] [24/50] w3 2281ms in=122 out=14 ttft=1353ms OK
+  [VAL val_baseline] [25/50] w0 2298ms in=111 out=14 ttft=1288ms OK
+  [VAL val_baseline] [26/50] w1 2298ms in=117 out=14 ttft=1288ms OK
+  [VAL val_baseline] [27/50] w2 2297ms in=115 out=14 ttft=1288ms OK
+  [VAL val_baseline] [28/50] w3 2296ms in=109 out=14 ttft=1371ms OK
+  [VAL val_baseline] [29/50] w0 2018ms in=108 out=14 ttft=1052ms OK
+  [VAL val_baseline] [30/50] w1 2017ms in=107 out=14 ttft=1052ms OK
+  [VAL val_baseline] [32/50] w3 1987ms in=114 out=14 ttft=1022ms OK
+  [VAL val_baseline] [31/50] w2 2016ms in=107 out=14 ttft=1052ms OK
+  [VAL val_baseline] [33/50] w0 2351ms in=107 out=13 ttft=1375ms OK
+  [VAL val_baseline] [34/50] w2 2408ms in=107 out=14 ttft=1373ms OK
+  [VAL val_baseline] [35/50] w3 2814ms in=116 out=14 ttft=1529ms OK
+  [VAL val_baseline] [36/50] w1 2815ms in=115 out=14 ttft=1530ms OK
+  [VAL val_baseline] [37/50] w0 2542ms in=113 out=14 ttft=903ms OK
+  [VAL val_baseline] [38/50] w1 2542ms in=106 out=14 ttft=1514ms OK
+  [VAL val_baseline] [39/50] w2 2135ms in=110 out=13 ttft=1252ms OK
+  [VAL val_baseline] [40/50] w3 2135ms in=108 out=13 ttft=1251ms OK
+  [VAL val_baseline] [41/50] w0 2321ms in=114 out=14 ttft=1256ms OK
+  [VAL val_baseline] [42/50] w3 2264ms in=114 out=13 ttft=1369ms OK
+  [VAL val_baseline] [43/50] w1 2306ms in=114 out=14 ttft=1369ms OK
+  [VAL val_baseline] [44/50] w2 2305ms in=111 out=14 ttft=1369ms OK
+  [VAL val_baseline] [45/50] w0 2161ms in=113 out=14 ttft=1196ms OK
+  [VAL val_baseline] [46/50] w1 2161ms in=116 out=14 ttft=1194ms OK
+  [VAL val_baseline] [47/50] w2 2120ms in=109 out=14 ttft=1154ms OK
+  [VAL val_baseline] [48/50] w3 2119ms in=120 out=14 ttft=1154ms OK
+  [VAL val_baseline] [49/50] w0 1252ms in=120 out=14 ttft=697ms OK
+  [VAL val_baseline] [50/50] w1 1251ms in=111 out=14 ttft=696ms OK
+  ───────────────────────────────────────────────────────
+  val_baseline: 50/50 OK (100.0%)
+  Latency: avg=2235ms p50=2250ms p90=2620ms  TTFT=1249ms
+  Output tokens: 14  Throughput: 0.45 req/s
+  Labels: {"neutral": 40, "negative": 5, "positive": 5}
+
+############################################################
+VALIDATION - Best config (50 items, run 1/2)
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: val_best_r1 ready (pid=46809)
+  [VAL val_best_r1] [ 1/50] w3 2187ms in=113 out=14 ttft=1222ms OK
+  [VAL val_best_r1] [ 2/50] w2 2188ms in=106 out=14 ttft=1223ms OK
+  [VAL val_best_r1] [ 3/50] w1 2190ms in=122 out=14 ttft=1224ms OK
+  [VAL val_best_r1] [ 4/50] w0 2192ms in=109 out=14 ttft=1226ms OK
+  [VAL val_best_r1] [ 5/50] w1 2074ms in=106 out=14 ttft=1108ms OK
+  [VAL val_best_r1] [ 6/50] w2 2073ms in=110 out=14 ttft=1107ms OK
+  [VAL val_best_r1] [ 8/50] w3 2073ms in=116 out=14 ttft=1107ms OK
+  [VAL val_best_r1] [ 7/50] w0 2074ms in=108 out=14 ttft=1109ms OK
+  [VAL val_best_r1] [ 9/50] w3 2231ms in=115 out=13 ttft=1269ms OK
+  [VAL val_best_r1] [10/50] w1 2300ms in=105 out=14 ttft=1270ms OK
+  [VAL val_best_r1] [11/50] w2 2698ms in=116 out=14 ttft=1412ms OK
+  [VAL val_best_r1] [12/50] w0 2699ms in=123 out=14 ttft=1414ms OK
+  [VAL val_best_r1] [13/50] w0 2521ms in=108 out=14 ttft=885ms OK
+  [VAL val_best_r1] [14/50] w1 2453ms in=104 out=13 ttft=1470ms OK
+  [VAL val_best_r1] [15/50] w3 2884ms in=118 out=14 ttft=1228ms OK
+  [VAL val_best_r1] [16/50] w2 2884ms in=118 out=14 ttft=1228ms OK
+  [VAL val_best_r1] [17/50] w0 2525ms in=115 out=14 ttft=935ms OK
+  [VAL val_best_r1] [18/50] w1 2525ms in=118 out=14 ttft=934ms OK
+  [VAL val_best_r1] [19/50] w2 1738ms in=106 out=13 ttft=868ms OK
+  [VAL val_best_r1] [20/50] w3 1738ms in=107 out=13 ttft=868ms OK
+  [VAL val_best_r1] [21/50] w1 2604ms in=106 out=13 ttft=1610ms OK
+  [VAL val_best_r1] [22/50] w0 2663ms in=111 out=14 ttft=1612ms OK
+  [VAL val_best_r1] [23/50] w3 3048ms in=122 out=14 ttft=1736ms OK
+  [VAL val_best_r1] [24/50] w2 3049ms in=112 out=14 ttft=1737ms OK
+  [VAL val_best_r1] [25/50] w0 2769ms in=111 out=14 ttft=908ms OK
+  [VAL val_best_r1] [26/50] w1 2784ms in=117 out=14 ttft=1716ms OK
+  [VAL val_best_r1] [27/50] w2 2783ms in=115 out=14 ttft=1454ms OK
+  [VAL val_best_r1] [28/50] w3 2783ms in=109 out=14 ttft=1454ms OK
+  [VAL val_best_r1] [29/50] w0 2780ms in=108 out=14 ttft=942ms OK
+  [VAL val_best_r1] [30/50] w1 2781ms in=107 out=14 ttft=1722ms OK
+  [VAL val_best_r1] [31/50] w2 2776ms in=107 out=14 ttft=1450ms OK
+  [VAL val_best_r1] [32/50] w3 2775ms in=114 out=14 ttft=1449ms OK
+  [VAL val_best_r1] [33/50] w0 2776ms in=107 out=14 ttft=945ms OK
+  [VAL val_best_r1] [34/50] w1 2774ms in=115 out=14 ttft=1722ms OK
+  [VAL val_best_r1] [35/50] w2 2775ms in=107 out=14 ttft=1451ms OK
+  [VAL val_best_r1] [36/50] w3 2775ms in=116 out=14 ttft=1451ms OK
+  [VAL val_best_r1] [37/50] w0 2499ms in=113 out=14 ttft=936ms OK
+  [VAL val_best_r1] [38/50] w1 2428ms in=106 out=13 ttft=1463ms OK
+  [VAL val_best_r1] [39/50] w3 2045ms in=108 out=13 ttft=1176ms OK
+  [VAL val_best_r1] [40/50] w2 2046ms in=110 out=13 ttft=1177ms OK
+  [VAL val_best_r1] [41/50] w0 2214ms in=114 out=14 ttft=637ms OK
+  [VAL val_best_r1] [42/50] w1 2213ms in=114 out=14 ttft=636ms OK
+  [VAL val_best_r1] [43/50] w3 2215ms in=114 out=13 ttft=1350ms OK
+  [VAL val_best_r1] [44/50] w2 3003ms in=111 out=14 ttft=1351ms OK
+  [VAL val_best_r1] [45/50] w0 2334ms in=113 out=14 ttft=953ms OK
+  [VAL val_best_r1] [46/50] w1 2333ms in=116 out=14 ttft=952ms OK
+  [VAL val_best_r1] [47/50] w2 2290ms in=109 out=14 ttft=909ms OK
+  [VAL val_best_r1] [48/50] w3 2128ms in=120 out=14 ttft=678ms OK
+  [VAL val_best_r1] [49/50] w0 1239ms in=120 out=14 ttft=718ms OK
+  [VAL val_best_r1] [50/50] w1 1239ms in=111 out=14 ttft=718ms OK
+  ───────────────────────────────────────────────────────
+  val_best_r1: 50/50 OK (100.0%)
+  Latency: avg=2423ms p50=2499ms p90=2884ms  TTFT=1202ms
+  Output tokens: 14  Throughput: 0.41 req/s
+  Labels: {"neutral": 40, "negative": 5, "positive": 5}
+
+############################################################
+VALIDATION - Best config (50 items, run 2/2)
+  SERVER: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ...
+  SERVER: val_best_r2 ready (pid=46829)
+  [VAL val_best_r2] [ 1/50] w2 2221ms in=106 out=14 ttft=1214ms OK
+  [VAL val_best_r2] [ 2/50] w0 2227ms in=109 out=14 ttft=1216ms OK
+  [VAL val_best_r2] [ 3/50] w1 2226ms in=122 out=14 ttft=1216ms OK
+  [VAL val_best_r2] [ 4/50] w3 2224ms in=113 out=14 ttft=1215ms OK
+  [VAL val_best_r2] [ 5/50] w2 2095ms in=110 out=14 ttft=1132ms OK
+  [VAL val_best_r2] [ 6/50] w1 2097ms in=106 out=14 ttft=1132ms OK
+  [VAL val_best_r2] [ 7/50] w0 2100ms in=108 out=14 ttft=1135ms OK
+  [VAL val_best_r2] [ 8/50] w3 2097ms in=116 out=14 ttft=1131ms OK
+  [VAL val_best_r2] [ 9/50] w3 2312ms in=115 out=13 ttft=1321ms OK
+  [VAL val_best_r2] [10/50] w0 2374ms in=123 out=13 ttft=1493ms OK
+  [VAL val_best_r2] [11/50] w1 2794ms in=105 out=14 ttft=1491ms OK
+  [VAL val_best_r2] [12/50] w2 2794ms in=116 out=14 ttft=1491ms OK
+  [VAL val_best_r2] [13/50] w0 2492ms in=108 out=13 ttft=899ms OK
+  [VAL val_best_r2] [14/50] w1 2498ms in=104 out=13 ttft=1470ms OK
+  [VAL val_best_r2] [15/50] w3 2974ms in=118 out=14 ttft=1224ms OK
+  [VAL val_best_r2] [16/50] w2 2976ms in=118 out=14 ttft=1226ms OK
+  [VAL val_best_r2] [17/50] w0 2612ms in=115 out=14 ttft=964ms OK
+  [VAL val_best_r2] [18/50] w1 2613ms in=118 out=14 ttft=986ms OK
+  [VAL val_best_r2] [19/50] w2 2139ms in=106 out=13 ttft=871ms OK
+  [VAL val_best_r2] [20/50] w3 2137ms in=107 out=13 ttft=870ms OK
+  [VAL val_best_r2] [21/50] w1 2628ms in=106 out=13 ttft=1610ms OK
+  [VAL val_best_r2] [22/50] w0 2695ms in=111 out=14 ttft=932ms OK
+  [VAL val_best_r2] [23/50] w3 2854ms in=122 out=14 ttft=1347ms OK
+  [VAL val_best_r2] [24/50] w2 2856ms in=112 out=14 ttft=1349ms OK
+  [VAL val_best_r2] [25/50] w1 2433ms in=117 out=14 ttft=762ms OK
+  [VAL val_best_r2] [26/50] w0 2434ms in=111 out=14 ttft=764ms OK
+  [VAL val_best_r2] [27/50] w2 2390ms in=115 out=14 ttft=916ms OK
+  [VAL val_best_r2] [28/50] w3 2387ms in=109 out=14 ttft=914ms OK
+  [VAL val_best_r2] [29/50] w1 2373ms in=107 out=14 ttft=711ms OK
+  [VAL val_best_r2] [30/50] w0 2375ms in=108 out=14 ttft=712ms OK
+  [VAL val_best_r2] [31/50] w2 2425ms in=107 out=14 ttft=910ms OK
+  [VAL val_best_r2] [32/50] w3 2424ms in=114 out=14 ttft=910ms OK
+  [VAL val_best_r2] [33/50] w0 2348ms in=107 out=13 ttft=758ms OK
+  [VAL val_best_r2] [34/50] w1 2415ms in=115 out=14 ttft=757ms OK
+  [VAL val_best_r2] [35/50] w3 2666ms in=116 out=14 ttft=896ms OK
+  [VAL val_best_r2] [36/50] w2 2668ms in=107 out=14 ttft=897ms OK
+  [VAL val_best_r2] [37/50] w0 2626ms in=113 out=14 ttft=974ms OK
+  [VAL val_best_r2] [38/50] w1 2560ms in=106 out=13 ttft=1007ms OK
+  [VAL val_best_r2] [39/50] w3 2242ms in=108 out=13 ttft=857ms OK
+  [VAL val_best_r2] [40/50] w2 2244ms in=110 out=13 ttft=861ms OK
+  [VAL val_best_r2] [41/50] w1 2333ms in=114 out=14 ttft=704ms OK
+  [VAL val_best_r2] [42/50] w0 2338ms in=114 out=14 ttft=707ms OK
+  [VAL val_best_r2] [43/50] w3 1794ms in=114 out=13 ttft=871ms OK
+  [VAL val_best_r2] [44/50] w2 2600ms in=111 out=14 ttft=875ms OK
+  [VAL val_best_r2] [45/50] w0 2436ms in=113 out=14 ttft=992ms OK
+  [VAL val_best_r2] [46/50] w2 2381ms in=109 out=14 ttft=939ms OK
+  [VAL val_best_r2] [47/50] w1 2434ms in=116 out=14 ttft=990ms OK
+  [VAL val_best_r2] [48/50] w3 2389ms in=120 out=14 ttft=711ms OK
+  [VAL val_best_r2] [49/50] w0 1787ms in=120 out=14 ttft=931ms OK
+  [VAL val_best_r2] [50/50] w1 1785ms in=111 out=14 ttft=930ms OK
+  ───────────────────────────────────────────────────────
+  val_best_r2: 50/50 OK (100.0%)
+  Latency: avg=2406ms p50=2390ms p90=2794ms  TTFT=1024ms
+  Output tokens: 14  Throughput: 0.42 req/s
+  Labels: {"neutral": 40, "negative": 5, "positive": 5}
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_validation.csv
+
+############################################################
+### ALL DONE in 976s (16.3m) ###
+############################################################
+
+Phase      Config                            OK%   Avg ms      P50   Req/s
+--------------------------------------------------------------------------------
+exploratory g1_A0                             95%    10536    10820    0.09
+exploratory g1_A1                            100%     6509     6524    0.15
+exploratory g1_A2                            100%     2281     2212    0.44
+exploratory g1_A3                            100%     3226     3224    0.31
+exploratory g2_w1                            100%     3796     3875    0.26
+exploratory g2_w4                            100%     9408     9106    0.11
+exploratory g2_w6                            100%    13260    14231    0.08
+exploratory g3_p1                            100%     3910     3948    0.26
+exploratory g3_p4                            100%    10706    10281    0.09
+exploratory g3_p6                            100%    13711    13801    0.07
+exploratory g4_c4096                         100%    10153     9946    0.10
+exploratory g4_c8192                         100%    10826    10613    0.09
+exploratory g5_b512_ub512                     95%     9817     9807    0.10
+exploratory g5_b1024_ub1024                  100%    10327    10324    0.10
+exploratory g5_b2048_ub2048                  100%    10526     9885    0.10
+validation_baseline val_baseline                     100%     2235     2250    0.45
+validation_best val_best_r1                      100%     2423     2499    0.41
+validation_best val_best_r2                      100%     2406     2390    0.42
+  Summary → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/summary_master.csv
+
+All results → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results

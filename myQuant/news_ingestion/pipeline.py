@@ -258,7 +258,7 @@ class BackfillPipeline:
         else:
             import concurrent.futures
 
-            llm_workers = llm_workers if llm_workers > 0 else 1
+            llm_workers = max(1, llm_workers)
             items_to_eval = [
                 (m, db_id_to_item.get(m.raw_news_id))
                 for m in mapped_news
@@ -267,51 +267,61 @@ class BackfillPipeline:
             if max_llm_items > 0:
                 items_to_eval = items_to_eval[:max_llm_items]
 
-            def _eval_one(mapping, news_item):
-                llm_run, llm_output, signal = self._evaluator.evaluate(mapping, news_item)
+            def _persist_result(mapping, news_item, llm_run, llm_output, signal):
+                nonlocal evaluated, signal_count
+                llm_run.run_id = run_id
+                run_db_id = self.repo.save_llm_run(llm_run)
+                llm_output.llm_run_id = run_db_id
+                self.repo.save_llm_output(llm_output)
+                evaluated += 1
                 attempts = list(self._evaluator.attempt_records)
-                return mapping, news_item, llm_run, llm_output, signal, attempts
+                if len(attempts) > 1:
+                    for prev_run, prev_output in attempts[:-1]:
+                        prev_run.run_id = run_id
+                        prev_run.input_hash = f"{prev_run.input_hash}-retry-{prev_run.run_id}"
+                        prev_db_id = self.repo.save_llm_run(prev_run)
+                        prev_output.llm_run_id = prev_db_id
+                        self.repo.save_llm_output(prev_output)
+                if signal is not None:
+                    signal.raw_news_id = mapping.raw_news_id
+                    signal.llm_run_id = run_db_id
+                    self.repo.save_signal(signal)
+                    signal_count += 1
+                    signals_data.append(dict(
+                        vt_symbol=signal.vt_symbol,
+                        event=signal.event,
+                        impact_direction=str(signal.impact_direction) if signal.impact_direction else "",
+                        impact_strength=signal.impact_strength,
+                        confidence=signal.confidence,
+                    ))
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=llm_workers) as executor:
-                futures = {
-                    executor.submit(_eval_one, m, ni): (m, ni)
-                    for m, ni in items_to_eval
-                }
-                for future in tqdm(
-                    concurrent.futures.as_completed(futures),
-                    total=len(futures),
-                    desc="LLM evaluating",
-                    unit="item",
-                ):
+            if llm_workers == 1:
+                for mapping, news_item in tqdm(items_to_eval, desc="LLM evaluating", unit="item"):
                     try:
-                        mapping, news_item, llm_run, llm_output, signal, attempts = future.result()
+                        llm_run, llm_output, signal = self._evaluator.evaluate(mapping, news_item)
+                        _persist_result(mapping, news_item, llm_run, llm_output, signal)
                     except Exception as exc:
                         errors.append(f"LLM evaluation failed: {exc}")
-                        continue
-                    llm_run.run_id = run_id
-                    run_db_id = self.repo.save_llm_run(llm_run)
-                    llm_output.llm_run_id = run_db_id
-                    self.repo.save_llm_output(llm_output)
-                    evaluated += 1
-                    if len(attempts) > 1:
-                        for prev_run, prev_output in attempts[:-1]:
-                            prev_run.run_id = run_id
-                            prev_run.input_hash = f"{prev_run.input_hash}-retry-{prev_run.run_id}"
-                            prev_db_id = self.repo.save_llm_run(prev_run)
-                            prev_output.llm_run_id = prev_db_id
-                            self.repo.save_llm_output(prev_output)
-                    if signal is not None:
-                        signal.raw_news_id = mapping.raw_news_id
-                        signal.llm_run_id = run_db_id
-                        self.repo.save_signal(signal)
-                        signal_count += 1
-                        signals_data.append(dict(
-                            vt_symbol=signal.vt_symbol,
-                            event=signal.event,
-                            impact_direction=str(signal.impact_direction) if signal.impact_direction else "",
-                            impact_strength=signal.impact_strength,
-                            confidence=signal.confidence,
-                        ))
+            else:
+                import concurrent.futures
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=llm_workers) as executor:
+                    futures = {
+                        executor.submit(self._evaluator.evaluate, m, ni): (m, ni)
+                        for m, ni in items_to_eval
+                    }
+                    for future in tqdm(
+                        concurrent.futures.as_completed(futures),
+                        total=len(futures),
+                        desc="LLM evaluating",
+                        unit="item",
+                    ):
+                        mapping, news_item = futures[future]
+                        try:
+                            llm_run, llm_output, signal = future.result()
+                            _persist_result(mapping, news_item, llm_run, llm_output, signal)
+                        except Exception as exc:
+                            errors.append(f"LLM evaluation failed: {exc}")
             self.repo.save_fetch_attempt(
                 run_id=run_id,
                 source="llm",

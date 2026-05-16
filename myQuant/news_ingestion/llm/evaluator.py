@@ -109,9 +109,8 @@ class DeepSeekNewsEvaluator:
                     response = self.client.completions.create(
                         model=self.model,
                         prompt=full_prompt,
-                        max_tokens=self.max_tokens,
+                        max_tokens=2048,
                         temperature=self.temperature,
-                        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
                     )
                     raw_response = str(response.choices[0].text or "")
                     if self.strip_thinking:

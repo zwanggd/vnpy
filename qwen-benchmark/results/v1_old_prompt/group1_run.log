@@ -1,0 +1,166 @@
+Loaded 50 news items for benchmark
+Rounds per config: 3, Total requests per config: 150
+Results → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results
+
+
+############################################################
+### GROUP 1: Prompt / max_tokens Variants ###
+############################################################
+Starting baseline server for Group 1...
+  Starting server: /opt/homebrew/bin/llama-server -m /Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf -c 4096 -ngl ... (see server.log for full args)
+  Server baseline_g1 healthy (pid=44524)
+
+────────────────────────────────────────────────────────────
+Group 1 - A0 (max_tokens=160) - Round 1/3
+  [group1_prompt_A0 r1] [ 1/50] w3 9030ms in=160 out=95 ttft=1668ms OK
+  [group1_prompt_A0 r1] [ 2/50] w2 9030ms in=153 out=95 ttft=1669ms OK
+  [group1_prompt_A0 r1] [ 3/50] w1 10987ms in=169 out=111 ttft=1671ms OK
+  [group1_prompt_A0 r1] [ 4/50] w0 12169ms in=156 out=120 ttft=1670ms OK
+  [group1_prompt_A0 r1] [ 5/50] w0 8422ms in=155 out=84 ttft=977ms OK
+  [group1_prompt_A0 r1] [ 6/50] w1 9904ms in=153 out=96 ttft=976ms OK
+  [group1_prompt_A0 r1] [ 7/50] w2 9331ms in=157 out=91 ttft=706ms OK
+  [group1_prompt_A0 r1] [ 8/50] w3 11686ms in=163 out=121 ttft=696ms OK
+  [group1_prompt_A0 r1] [ 9/50] w1 9784ms in=152 out=104 ttft=758ms OK
+  [group1_prompt_A0 r1] [10/50] w0 13343ms in=170 out=136 ttft=766ms OK
+  [group1_prompt_A0 r1] [11/50] w3 9242ms in=162 out=97 ttft=705ms OK
+  [group1_prompt_A0 r1] [12/50] w2 13953ms in=163 out=144 ttft=733ms OK
+  [group1_prompt_A0 r1] [13/50] w0 9796ms in=155 out=96 ttft=742ms OK
+  [group1_prompt_A0 r1] [14/50] w1 8460ms in=151 out=79 ttft=733ms OK
+  [group1_prompt_A0 r1] [15/50] w3 10496ms in=165 out=111 ttft=771ms OK
+  [group1_prompt_A0 r1] [16/50] w1 8895ms in=165 out=97 ttft=752ms OK
+  [group1_prompt_A0 r1] [17/50] w2 15140ms in=165 out=156 ttft=773ms OK
+  [group1_prompt_A0 r1] [18/50] w0 11178ms in=162 out=110 ttft=744ms OK
+  [group1_prompt_A0 r1] [19/50] w2 11046ms in=153 out=118 ttft=740ms OK
+  [group1_prompt_A0 r1] [20/50] w1 6952ms in=153 out=77 ttft=703ms OK
+  [group1_prompt_A0 r1] [21/50] w3 10071ms in=154 out=101 ttft=1013ms OK
+  [group1_prompt_A0 r1] [22/50] w0 10641ms in=158 out=104 ttft=930ms OK
+  [group1_prompt_A0 r1] [23/50] w2 8960ms in=159 out=91 ttft=679ms OK
+  [group1_prompt_A0 r1] [24/50] w0 7838ms in=158 out=83 ttft=654ms OK
+  [group1_prompt_A0 r1] [25/50] w3 10928ms in=169 out=111 ttft=741ms OK
+  [group1_prompt_A0 r1] [26/50] w1 10417ms in=164 out=110 ttft=716ms OK
+  [group1_prompt_A0 r1] [27/50] w2 9441ms in=162 out=97 ttft=675ms OK
+  [group1_prompt_A0 r1] [28/50] w3 8979ms in=156 out=91 ttft=662ms OK
+  [group1_prompt_A0 r1] [29/50] w0 9188ms in=155 out=94 ttft=724ms OK
+  [group1_prompt_A0 r1] [30/50] w1 11014ms in=154 out=118 ttft=704ms OK
+  [group1_prompt_A0 r1] [31/50] w2 8704ms in=154 out=88 ttft=671ms OK
+  [group1_prompt_A0 r1] [32/50] w3 10592ms in=161 out=110 ttft=656ms OK
+  [group1_prompt_A0 r1] [33/50] w0 8869ms in=154 out=93 ttft=706ms OK
+  [group1_prompt_A0 r1] [34/50] w2 8133ms in=154 out=83 ttft=736ms OK
+  [group1_prompt_A0 r1] [35/50] w1 12134ms in=162 out=123 ttft=710ms OK
+  [group1_prompt_A0 r1] [36/50] w0 9564ms in=160 out=94 ttft=1209ms OK
+  [group1_prompt_A0 r1] [37/50] w3 10473ms in=163 out=99 ttft=1211ms OK
+  [group1_prompt_A0 r1] [38/50] w1 9257ms in=153 out=87 ttft=688ms OK
+  [group1_prompt_A0 r1] [39/50] w2 9898ms in=157 out=94 ttft=831ms OK
+  [group1_prompt_A0 r1] [40/50] w3 10119ms in=155 out=98 ttft=740ms OK
+  [group1_prompt_A0 r1] [41/50] w0 10568ms in=161 out=104 ttft=752ms OK
+  [group1_prompt_A0 r1] [42/50] w1 10074ms in=161 out=97 ttft=754ms OK
+  [group1_prompt_A0 r1] [43/50] w2 9577ms in=158 out=91 ttft=800ms OK
+  [group1_prompt_A0 r1] [44/50] w3 11972ms in=161 out=122 ttft=702ms OK
+  [group1_prompt_A0 r1] [45/50] w0 12493ms in=160 out=128 ttft=804ms OK
+  [group1_prompt_A0 r1] [46/50] w2 8884ms in=156 out=89 ttft=747ms OK
+  [group1_prompt_A0 r1] [47/50] w1 12611ms in=163 out=123 ttft=730ms OK
+  [group1_prompt_A0 r1] [48/50] w3 9753ms in=167 out=117 ttft=766ms OK
+  [group1_prompt_A0 r1] [49/50] w1 7027ms in=158 out=105 ttft=745ms OK
+  [group1_prompt_A0 r1] [50/50] w0 8848ms in=167 out=124 ttft=822ms OK
+  Saved 50 records → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/group1_prompt_A0/round_1.jsonl
+
+────────────────────────────────────────────────────────────
+Group 1 - A0 (max_tokens=160) - Round 2/3
+  [group1_prompt_A0 r2] [ 1/50] w0 8055ms in=156 out=85 ttft=1668ms OK
+  [group1_prompt_A0 r2] [ 2/50] w2 9321ms in=153 out=95 ttft=1665ms OK
+  [group1_prompt_A0 r2] [ 3/50] w3 9388ms in=160 out=96 ttft=1664ms OK
+  [group1_prompt_A0 r2] [ 4/50] w1 11644ms in=169 out=111 ttft=1478ms OK
+  [group1_prompt_A0 r2] [ 5/50] w0 9272ms in=155 out=85 ttft=704ms OK
+  [group1_prompt_A0 r2] [ 6/50] w2 8871ms in=157 out=84 ttft=1327ms OK
+  [group1_prompt_A0 r2] [ 7/50] w1 11882ms in=153 out=119 ttft=1236ms OK
+  [group1_prompt_A0 r2] [ 8/50] w3 11996ms in=163 out=132 ttft=852ms OK
+  [group1_prompt_A0 r2] [ 9/50] w1 9555ms in=152 out=104 ttft=301ms OK
+  [group1_prompt_A0 r2] [10/50] w0 12286ms in=170 out=135 ttft=262ms OK
+  [group1_prompt_A0 r2] [11/50] w3 9773ms in=162 out=102 ttft=826ms OK
+  [group1_prompt_A0 r2] [12/50] w2 13312ms in=163 out=144 ttft=252ms OK
+  [group1_prompt_A0 r2] [13/50] w0 8992ms in=155 out=96 ttft=270ms OK
+  [group1_prompt_A0 r2] [14/50] w1 8133ms in=151 out=79 ttft=720ms OK
+  [group1_prompt_A0 r2] [15/50] w3 9703ms in=165 out=102 ttft=716ms OK
+  [group1_prompt_A0 r2] [16/50] w1 8370ms in=165 out=97 ttft=717ms OK
+  [group1_prompt_A0 r2] [17/50] w0 10502ms in=162 out=111 ttft=770ms OK
+  [group1_prompt_A0 r2] [18/50] w2 15035ms in=165 out=156 ttft=244ms OK
+  [group1_prompt_A0 r2] [19/50] w3 8142ms in=154 out=82 ttft=730ms OK
+  [group1_prompt_A0 r2] [20/50] w2 11313ms in=153 out=116 ttft=229ms OK
+  [group1_prompt_A0 r2] [21/50] w1 7283ms in=153 out=77 ttft=744ms OK
+  [group1_prompt_A0 r2] [22/50] w0 10822ms in=158 out=109 ttft=744ms OK
+  [group1_prompt_A0 r2] [23/50] w2 8484ms in=159 out=91 ttft=729ms OK
+  [group1_prompt_A0 r2] [24/50] w0 8146ms in=158 out=87 ttft=728ms OK
+  [group1_prompt_A0 r2] [25/50] w3 10537ms in=169 out=111 ttft=198ms OK
+  [group1_prompt_A0 r2] [26/50] w1 9374ms in=164 out=97 ttft=268ms OK
+  [group1_prompt_A0 r2] [27/50] w2 9882ms in=162 out=97 ttft=736ms OK
+  [group1_prompt_A0 r2] [28/50] w3 9567ms in=156 out=93 ttft=759ms OK
+  [group1_prompt_A0 r2] [29/50] w0 8826ms in=155 out=84 ttft=715ms OK
+  [group1_prompt_A0 r2] [30/50] w1 11468ms in=154 out=118 ttft=751ms OK
+  [group1_prompt_A0 r2] [31/50] w2 9052ms in=154 out=88 ttft=741ms OK
+  [group1_prompt_A0 r2] [32/50] w0 8119ms in=154 out=83 ttft=669ms OK
+  [group1_prompt_A0 r2] [33/50] w3 11213ms in=161 out=110 ttft=743ms OK
+  [group1_prompt_A0 r2] [34/50] w2 8226ms in=154 out=83 ttft=703ms OK
+  [group1_prompt_A0 r2] [35/50] w1 12331ms in=162 out=123 ttft=730ms OK
+  [group1_prompt_A0 r2] [36/50] w0 8747ms in=160 out=89 ttft=801ms OK
+  [group1_prompt_A0 r2] [37/50] w3 13099ms in=163 out=132 ttft=684ms OK
+  [group1_prompt_A0 r2] [38/50] w1 8490ms in=153 out=86 ttft=696ms OK
+  [group1_prompt_A0 r2] [39/50] w2 8892ms in=157 out=91 ttft=771ms OK
+  [group1_prompt_A0 r2] [40/50] w3 9586ms in=155 out=100 ttft=718ms OK
+  [group1_prompt_A0 r2] [41/50] w0 10075ms in=161 out=107 ttft=245ms OK
+  [group1_prompt_A0 r2] [42/50] w1 9404ms in=161 out=97 ttft=698ms OK
+  [group1_prompt_A0 r2] [43/50] w2 8829ms in=158 out=95 ttft=731ms OK
+  [group1_prompt_A0 r2] [44/50] w3 8448ms in=161 out=96 ttft=735ms OK
+  [group1_prompt_A0 r2] [45/50] w0 8508ms in=160 out=104 ttft=260ms OK
+  [group1_prompt_A0 r2] [46/50] w2 7324ms in=156 out=90 ttft=234ms OK
+  [group1_prompt_A0 r2] [47/50] w1 10079ms in=163 out=123 ttft=224ms OK
+  [group1_prompt_A0 r2] [48/50] w3 9946ms in=167 out=137 ttft=239ms OK
+  [group1_prompt_A0 r2] [49/50] w0 8408ms in=167 out=124 ttft=218ms OK
+  [group1_prompt_A0 r2] [50/50] w1 6782ms in=158 out=105 ttft=246ms OK
+  Saved 50 records → /Users/kai/Personal_Projects/VNPY/vnpy/qwen-benchmark/results/group1_prompt_A0/round_2.jsonl
+
+────────────────────────────────────────────────────────────
+Group 1 - A0 (max_tokens=160) - Round 3/3
+  [group1_prompt_A0 r3] [ 1/50] w2 8573ms in=153 out=95 ttft=1172ms OK
+  [group1_prompt_A0 r3] [ 2/50] w3 9171ms in=160 out=96 ttft=1338ms OK
+  [group1_prompt_A0 r3] [ 3/50] w1 10389ms in=169 out=111 ttft=1173ms OK
+  [group1_prompt_A0 r3] [ 4/50] w0 11228ms in=156 out=120 ttft=1340ms OK
+  [group1_prompt_A0 r3] [ 5/50] w0 7925ms in=155 out=84 ttft=722ms OK
+  [group1_prompt_A0 r3] [ 6/50] w1 8371ms in=153 out=95 ttft=290ms OK
+  [group1_prompt_A0 r3] [ 7/50] w2 7925ms in=157 out=90 ttft=202ms OK
+  [group1_prompt_A0 r3] [ 8/50] w3 10574ms in=163 out=123 ttft=764ms OK
+  [group1_prompt_A0 r3] [ 9/50] w1 8467ms in=152 out=104 ttft=230ms OK
+  [group1_prompt_A0 r3] [10/50] w0 11042ms in=170 out=135 ttft=250ms OK
+  [group1_prompt_A0 r3] [11/50] w2 11682ms in=163 out=144 ttft=204ms OK
+  [group1_prompt_A0 r3] [12/50] w3 8417ms in=162 out=102 ttft=248ms OK
+  [group1_prompt_A0 r3] [13/50] w0 8335ms in=155 out=96 ttft=222ms OK
+  [group1_prompt_A0 r3] [14/50] w1 7036ms in=151 out=79 ttft=229ms OK
+  [group1_prompt_A0 r3] [15/50] w1 7829ms in=165 out=97 ttft=252ms OK
+  [group1_prompt_A0 r3] [16/50] w2 13221ms in=165 out=156 ttft=222ms OK
+  [group1_prompt_A0 r3] [17/50] w0 9457ms in=162 out=110 ttft=232ms OK
+  [group1_prompt_A0 r3] [18/50] w3 14495ms in=165 out=160 ttft=734ms FAIL
+  [group1_prompt_A0 r3] [19/50] w3 8150ms in=154 out=83 ttft=684ms OK
+  [group1_prompt_A0 r3] [20/50] w1 6716ms in=153 out=77 ttft=825ms OK
+  [group1_prompt_A0 r3] [21/50] w0 10158ms in=158 out=108 ttft=754ms OK
+  [group1_prompt_A0 r3] [22/50] w2 12420ms in=153 out=125 ttft=253ms OK
+  [group1_prompt_A0 r3] [23/50] w2 8323ms in=159 out=91 ttft=740ms OK
+  [group1_prompt_A0 r3] [24/50] w3 10373ms in=169 out=111 ttft=676ms OK
+  [group1_prompt_A0 r3] [25/50] w0 9191ms in=158 out=95 ttft=701ms OK
+  [group1_prompt_A0 r3] [26/50] w1 9268ms in=164 out=97 ttft=268ms OK
+  [group1_prompt_A0 r3] [27/50] w2 9843ms in=162 out=97 ttft=765ms OK
+  [group1_prompt_A0 r3] [28/50] w3 9360ms in=156 out=91 ttft=707ms OK
+  [group1_prompt_A0 r3] [29/50] w0 8387ms in=155 out=84 ttft=700ms OK
+  [group1_prompt_A0 r3] [30/50] w1 11056ms in=154 out=118 ttft=754ms OK
+  [group1_prompt_A0 r3] [31/50] w0 7424ms in=154 out=84 ttft=686ms OK
+  [group1_prompt_A0 r3] [32/50] w3 9887ms in=161 out=109 ttft=217ms OK
+  [group1_prompt_A0 r3] [33/50] w2 11894ms in=154 out=125 ttft=760ms OK
+  [group1_prompt_A0 r3] [34/50] w1 11196ms in=162 out=123 ttft=356ms OK
+  [group1_prompt_A0 r3] [35/50] w2 8438ms in=154 out=83 ttft=737ms OK
+  [group1_prompt_A0 r3] [36/50] w0 8764ms in=160 out=89 ttft=773ms OK
+  [group1_prompt_A0 r3] [37/50] w3 12755ms in=163 out=132 ttft=294ms OK
+  [group1_prompt_A0 r3] [38/50] w1 8619ms in=153 out=87 ttft=732ms OK
+  [group1_prompt_A0 r3] [39/50] w2 8775ms in=157 out=94 ttft=728ms OK
+  [group1_prompt_A0 r3] [40/50] w3 8853ms in=155 out=101 ttft=770ms OK
+  [group1_prompt_A0 r3] [41/50] w0 8792ms in=161 out=107 ttft=217ms OK
+  [group1_prompt_A0 r3] [42/50] w1 8012ms in=161 out=97 ttft=259ms OK
+  [group1_prompt_A0 r3] [43/50] w2 7876ms in=158 out=95 ttft=237ms OK
+  [group1_prompt_A0 r3] [44/50] w3 7934ms in=161 out=96 ttft=251ms OK

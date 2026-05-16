@@ -1,0 +1,262 @@
+[
+  {
+    "idx": 0,
+    "title": "宁德时代:关于控股股东无偿捐赠部分公司股份的进展公告",
+    "deepseek": {
+      "event": "控股股东厦门瑞庭投资有限公司向上海交通大学教育发展基金会无偿捐赠2,000,000股公司股份，已完成过户登记。",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.9,
+      "reason": "捐赠行为不改变公司控制权，不影响经营，市场反应通常中性；但可能提升社会形象，影响极小。",
+      "evidence": "本次捐赠事项不会导致公司控股股东及实际控制人发生变化，不会对公司治理结构及持续经营能力产生重大影响。"
+    },
+    "deepseek_elapsed": 5.5,
+    "qwen": {
+      "event": "宁德时代控股股东无偿捐赠部分公司股份",
+      "relation_type": "direct_company",
+      "impact_direction": "positive",
+      "impact_strength": 0.5,
+      "time_horizon": "short",
+      "confidence": 0.7,
+      "reason": "控股股东无偿捐赠股份通常被视为支持公司稳定或改善股权结构的积极信号，有助于增强市场信心，但具体影响取决于捐赠对象及后续安排，故影响程度中等。",
+      "evidence": "宁德时代:关于控股股东无偿捐赠部分公司股份的进展公告"
+    },
+    "qwen_elapsed": 3.9
+  },
+  {
+    "idx": 1,
+    "title": "宁德时代:H股公告(截至2026年4月30日止股份发行人的证券变动月报表)",
+    "deepseek": {
+      "event": "宁德时代发布H股证券变动月报表",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.9,
+      "reason": "该公告为常规信息披露，反映截至2026年4月30日的股份变动情况，不涉及重大经营变化，对股价影响中性。",
+      "evidence": "宁德时代:H股公告(截至2026年4月30日止股份发行人的证券变动月报表)"
+    },
+    "deepseek_elapsed": 4.5,
+    "qwen": {
+      "event": "宁德时代发布截至2026年4月30日的证券变动月报表",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "该新闻为常规性信息披露，仅反映公司股本结构的例行变动，未包含重大利好或利空消息，对股价直接影响有限。",
+      "evidence": "宁德时代:H股公告(截至2026年4月30日止股份发行人的证券变动月报表)"
+    },
+    "qwen_elapsed": 3.7
+  },
+  {
+    "idx": 2,
+    "title": "宁德时代:关于完成配售H股的公告",
+    "deepseek": {
+      "event": "宁德时代完成H股配售",
+      "relation_type": "direct_company",
+      "impact_direction": "positive",
+      "impact_strength": 0.5,
+      "time_horizon": "short",
+      "confidence": 0.7,
+      "reason": "完成H股配售有助于公司补充资本，支持海外业务拓展，但短期内可能稀释每股收益，影响中性偏正面。",
+      "evidence": "宁德时代:关于完成配售H股的公告"
+    },
+    "deepseek_elapsed": 5.2,
+    "qwen": {
+      "event": "宁德时代完成H股配售",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "完成H股配售通常意味着公司成功融资，但可能带来短期股本稀释压力，整体影响偏中性或轻微正面取决于资金用途和市场情绪。",
+      "evidence": "宁德时代:关于完成配售H股的公告"
+    },
+    "qwen_elapsed": 3.0
+  },
+  {
+    "idx": 4,
+    "title": "宁德时代:H股公告(翌日披露报表)",
+    "deepseek": {
+      "event": "宁德时代发布H股翌日披露报表",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.9,
+      "reason": "翌日披露报表为常规信息披露，不涉及重大经营变化，对股价影响中性。",
+      "evidence": "宁德时代:H股公告(翌日披露报表)"
+    },
+    "deepseek_elapsed": 3.9,
+    "qwen": {
+      "event": "宁德时代发布H股翌日披露报表",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.9,
+      "reason": "该新闻仅为常规的信息披露公告，属于例行程序，不包含实质性利好或利空信息，对股价无直接影响。",
+      "evidence": "宁德时代:H股公告(翌日披露报表)"
+    },
+    "qwen_elapsed": 2.9
+  },
+  {
+    "idx": 6,
+    "title": "宁德时代:关于根据一般性授权配售新H股的公告",
+    "deepseek": {
+      "event": "宁德时代根据一般性授权配售新H股",
+      "relation_type": "direct_company",
+      "impact_direction": "positive",
+      "impact_strength": 0.6,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "配售新H股可募集资金，用于扩大业务或优化资本结构，通常被视为利好，但可能稀释每股收益，影响有限。",
+      "evidence": "宁德时代:关于根据一般性授权配售新H股的公告"
+    },
+    "deepseek_elapsed": 5.4,
+    "qwen": {
+      "event": "宁德时代发布根据一般性授权配售新H股的公告",
+      "relation_type": "direct_company",
+      "impact_direction": "negative",
+      "impact_strength": 0.6,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "配售新股通常意味着股本稀释，可能短期内对股价造成压力，尽管融资有助于公司发展，但市场往往对稀释效应反应敏感。",
+      "evidence": "关于根据一般性授权配售新H股的公告"
+    },
+    "qwen_elapsed": 4.0
+  },
+  {
+    "idx": 7,
+    "title": "宁德时代:中国国际金融股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告",
+    "deepseek": {
+      "event": "宁德时代股东向特定机构投资者询价转让股份",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.7,
+      "reason": "股东询价转让股份通常不直接影响公司基本面，但可能引发市场对减持的担忧，短期情绪偏中性。",
+      "evidence": "宁德时代:中国国际金融股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告"
+    },
+    "deepseek_elapsed": 4.4,
+    "qwen": {
+      "event": "宁德时代股东通过询价转让方式向特定机构投资者出让股份，中金公司出具核查报告",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "询价转让通常被视为大股东减持的一种合规方式，可能引发市场对筹码供给增加的担忧，但因为是向特定机构投资者转让，对二级市场直接冲击相对可控，整体影响偏中性或轻微负面",
+      "evidence": "宁德时代:中国国际金融股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告"
+    },
+    "qwen_elapsed": 4.0
+  },
+  {
+    "idx": 10,
+    "title": "宁德时代:中信建投证券股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告",
+    "deepseek": {
+      "event": "中信建投证券发布关于宁德时代股东向特定机构投资者询价转让股份的核查报告",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.6,
+      "reason": "股东询价转让股份属于常规操作，核查报告本身不直接改变公司基本面，但可能影响短期市场情绪和筹码结构，影响方向中性偏弱。",
+      "evidence": "宁德时代:中信建投证券股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告"
+    },
+    "deepseek_elapsed": 5.0,
+    "qwen": {
+      "event": "宁德时代股东通过中信建投进行询价转让股份",
+      "relation_type": "direct_company",
+      "impact_direction": "negative",
+      "impact_strength": 0.4,
+      "time_horizon": "short",
+      "confidence": 0.6,
+      "reason": "股东询价转让通常被视为减持信号，可能引发市场对公司未来股价走势的担忧，导致短期情绪承压，但询价转让机制本身旨在减少对市场流动性的直接冲击，因此影响程度中等偏下。",
+      "evidence": "宁德时代:中信建投证券股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告"
+    },
+    "qwen_elapsed": 4.6
+  },
+  {
+    "idx": 3,
+    "title": "宁德时代:关于2026年度第二期绿色科技创新债券发行完成的公告",
+    "deepseek": {
+      "event": "宁德时代完成2026年度第二期绿色科技创新债券发行",
+      "relation_type": "direct_company",
+      "impact_direction": "positive",
+      "impact_strength": 0.5,
+      "time_horizon": "short",
+      "confidence": 0.7,
+      "reason": "债券成功发行表明公司融资渠道畅通，资金用于绿色科技创新，有助于提升长期竞争力，但短期直接影响有限。",
+      "evidence": "宁德时代:关于2026年度第二期绿色科技创新债券发行完成的公告"
+    },
+    "deepseek_elapsed": 4.3,
+    "qwen": {
+      "event": "宁德时代完成2026年度第二期绿色科技创新债券发行",
+      "relation_type": "direct_company",
+      "impact_direction": "positive",
+      "impact_strength": 0.5,
+      "time_horizon": "short",
+      "confidence": 0.7,
+      "reason": "债券发行完成表明公司融资渠道畅通，有助于优化资本结构并支持绿色科技创新项目，体现公司稳健的财务状况和战略执行力。",
+      "evidence": "宁德时代:关于2026年度第二期绿色科技创新债券发行完成的公告"
+    },
+    "qwen_elapsed": 3.4
+  },
+  {
+    "idx": 5,
+    "title": "宁德时代:第四届董事会第十六次会议决议公告",
+    "deepseek": {
+      "event": "宁德时代召开第四届董事会第十六次会议并发布决议公告",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.9,
+      "reason": "董事会决议公告属于常规公司治理披露，通常不包含重大利好或利空信息，对股价影响中性。",
+      "evidence": "宁德时代:第四届董事会第十六次会议决议公告"
+    },
+    "deepseek_elapsed": 4.4,
+    "qwen": {
+      "event": "宁德时代召开第四届董事会第十六次会议并发布决议公告",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.1,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "董事会决议公告属于常规公司治理行为，通常用于披露会议通过的常规事项或程序性决定，除非涉及重大资产重组或战略变更，否则对股价无显著直接影响。",
+      "evidence": "宁德时代:第四届董事会第十六次会议决议公告"
+    },
+    "qwen_elapsed": 4.0
+  },
+  {
+    "idx": 8,
+    "title": "宁德时代:股东询价转让结果报告书暨持股5%以上股东持有权益比例降至5%以下的权益变动提示性公告",
+    "deepseek": {
+      "event": "宁德时代股东询价转让完成，持股5%以上股东权益比例降至5%以下",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "股东询价转让属于常规减持行为，短期可能带来股价波动，但转让完成消除了不确定性，且持股比例降至5%以下后后续减持无需披露，整体影响中性。",
+      "evidence": "持股5%以上股东持有权益比例降至5%以下的权益变动提示性公告"
+    },
+    "deepseek_elapsed": 5.1,
+    "qwen": {
+      "event": "宁德时代股东询价转让完成，持股5%以上股东权益比例降至5%以下",
+      "relation_type": "direct_company",
+      "impact_direction": "neutral",
+      "impact_strength": 0.3,
+      "time_horizon": "short",
+      "confidence": 0.8,
+      "reason": "该公告主要涉及股东层面的股权变动，属于既定事实的披露，未涉及公司基本面、业绩或重大战略的实质性变化，市场通常将其视为中性事件，短期情绪影响有限。",
+      "evidence": "持股5%以上股东持有权益比例降至5%以下"
+    },
+    "qwen_elapsed": 4.9
+  }
+]

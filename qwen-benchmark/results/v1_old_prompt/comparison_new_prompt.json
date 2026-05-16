@@ -1,0 +1,202 @@
+[
+  {
+    "idx": 0,
+    "title": "宁德时代:关于控股股东无偿捐赠部分公司股份的进展公告",
+    "ds": {
+      "event_type": "governance",
+      "impact_channel": "governance_or_control",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "ds_s": 3.2,
+    "qw": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 1,
+    "title": "宁德时代:H股公告(截至2026年4月30日止股份发行人的证券变动月报表)",
+    "ds": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.9
+    },
+    "ds_s": 2.3,
+    "qw": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0,
+      "confidence": 0.95
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 2,
+    "title": "宁德时代:关于完成配售H股的公告",
+    "ds": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.6
+    },
+    "ds_s": 2.3,
+    "qw": {
+      "event_type": "financing",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.5
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 4,
+    "title": "宁德时代:H股公告(翌日披露报表)",
+    "ds": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.9
+    },
+    "ds_s": 2.5,
+    "qw": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0,
+      "confidence": 0.95
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 6,
+    "title": "宁德时代:关于根据一般性授权配售新H股的公告",
+    "ds": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "ds_s": 2.6,
+    "qw": {
+      "event_type": "financing",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.5
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 7,
+    "title": "宁德时代:中国国际金融股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告",
+    "ds": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "ds_s": 2.2,
+    "qw": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "negative",
+      "score": -0.4,
+      "confidence": 0.7
+    },
+    "qw_s": 2.5
+  },
+  {
+    "idx": 10,
+    "title": "宁德时代:中信建投证券股份有限公司关于宁德时代新能源科技股份有限公司股东向特定机构投资者询价转让股份的核查报告",
+    "ds": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.6
+    },
+    "ds_s": 2.2,
+    "qw": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "negative",
+      "score": -0.4,
+      "confidence": 0.7
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 3,
+    "title": "宁德时代:关于2026年度第二期绿色科技创新债券发行完成的公告",
+    "ds": {
+      "event_type": "financing",
+      "impact_channel": "financing_or_liquidity",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "ds_s": 2.3,
+    "qw": {
+      "event_type": "financing",
+      "impact_channel": "financing_or_liquidity",
+      "direction": "positive",
+      "score": 0.3,
+      "confidence": 0.8
+    },
+    "qw_s": 2.6
+  },
+  {
+    "idx": 5,
+    "title": "宁德时代:第四届董事会第十六次会议决议公告",
+    "ds": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.9
+    },
+    "ds_s": 2.3,
+    "qw": {
+      "event_type": "routine",
+      "impact_channel": "routine_disclosure",
+      "direction": "neutral",
+      "score": 0,
+      "confidence": 0.9
+    },
+    "qw_s": 2.4
+  },
+  {
+    "idx": 8,
+    "title": "宁德时代:股东询价转让结果报告书暨持股5%以上股东持有权益比例降至5%以下的权益变动提示性公告",
+    "ds": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "ds_s": 2.6,
+    "qw": {
+      "event_type": "share_supply",
+      "impact_channel": "share_supply",
+      "direction": "neutral",
+      "score": 0.0,
+      "confidence": 0.8
+    },
+    "qw_s": 2.4
+  }
+]

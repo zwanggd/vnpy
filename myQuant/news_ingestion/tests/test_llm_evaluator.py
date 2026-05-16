@@ -251,7 +251,7 @@ def test_llama_cpp_completions_api(mapped_news: MappedNews, news_item: RawNewsIt
     assert "temperature" in call
     assert "prompt" in call
     assert "response_format" not in call
-    assert call.get("extra_body", {}).get("chat_template_kwargs", {}).get("enable_thinking") is False
+    assert call.get("max_tokens") == 2048  # llama.cpp completions use higher limit for think blocks
 
     # Verify provider in run record
     assert run.provider == "llama_cpp"
