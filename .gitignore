@@ -1,4 +1,5 @@
 # Python
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -15,13 +16,13 @@
 .vs
 x64
 
-# Temp
-build
-dist
+# Temp / Build
+build/
+dist/
 *.local
 
-# VeighNa
-.vntrader
+# VeighNa (market DB + agent DB)
+.vntrader/
 
 # Visual Studio intermediate files
 *.exp
@@ -41,3 +42,33 @@ _templates
 # Alpha
 lab/
 /.mypy_cache
+
+# --- Data artifacts (derived, not source) ---
+*.csv
+*.tsv
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.pickle
+*.pkl
+backtests/results/
+
+# --- Sisyphus session state (keep plans) ---
+.sisyphus/boulder.json*
+.sisyphus/resume.md
+.sisyphus/run-continuation
+.sisyphus/drafts/
+
+# --- Qwen benchmark outputs ---
+qwen-benchmark/results/
+qwen-benchmark/reports/
+qwen-benchmark/scripts/__pycache__/
+
+# --- Conda env ---
+.conda/
+*.conda

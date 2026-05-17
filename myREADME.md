@@ -79,3 +79,39 @@ conda run -n vnpy43 python backtests/scripts/run_agent_news_backfill.py \
 - `DEEPSEEK_API_KEY` 不得写入报告或日志，测试用 fake client
 - v0.1 仅离线回测，无实时调度/策略执行
 - API Key 仅在 LLM 实时阶段需要，dry-run/skip-llm 不强制
+
+## CTA 策略开发与部署
+
+### 策略文件位置
+
+VNPY 的 `MainEngine` 启动时执行 `os.chdir(TRADER_DIR)` 将工作目录切到 `~/.vntrader/`。CTA 引擎从 `{CWD}/strategies/` 扫描策略类。
+
+**自定义策略必须部署到：`~/.vntrader/strategies/`**
+
+不是以下位置（前端不扫或属于框架内置）：
+- ~~`vnpy/strategies/`~~ （CWD 已被引擎改为 `~/.vntrader/`）
+- ~~`vnpy_ctastrategy/strategies/`~~ （内置策略目录，`pip` 升级会覆盖）
+- ~~`myQuant/strategies/`~~ （同上）
+
+### 部署
+
+```bash
+cp vnpy/strategies/*.py ~/.vntrader/strategies/
+```
+
+开发时在 `vnpy/strategies/` 编辑，部署时复制到 `~/.vntrader/strategies/`，重启前端生效。
+
+### 当前策略
+
+| 策略 | 源文件 | 描述 |
+|------|------|------|
+| MacdStrategy | strategies/macd_strategy.py | MACD 金叉死叉，支持仓位比例和金字塔加仓 |
+| CatlMultiSignalStrategy | strategies/catl_multi_signal.py | RSI + MACD + 成交量多信号组合 |
+
+### 策略开发规范
+
+1. 继承 `CtaTemplate`（或 `TargetPosTemplate`），导入自 `vnpy_ctastrategy`
+2. `author`、`parameters`、`variables` 必须声明为类属性
+3. `__init__` 签名必须匹配 `(self, cta_engine, strategy_name, vt_symbol, setting)`
+4. 文件命名下划线模式（`macd_strategy.py`），类名驼峰模式（`MacdStrategy`）
+5. 回测通过 `conda run -n vnpy43 python backtests/run_*.py` 执行
