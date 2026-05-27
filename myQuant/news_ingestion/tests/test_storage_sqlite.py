@@ -25,6 +25,7 @@ REQUIRED_TABLES = {
     "agent_llm_output",
     "agent_signal",
     "agent_source_cursor",
+    "agent_daily_signal",
 }
 
 REQUIRED_COLUMNS = {
@@ -148,6 +149,7 @@ REQUIRED_COLUMNS = {
         "source_item_id": "TEXT",
         "prompt_version": "TEXT",
         "schema_version": "TEXT",
+        "signal_version": "TEXT",
         "created_at": "DATETIME",
     },
     "agent_source_cursor": {
@@ -160,6 +162,22 @@ REQUIRED_COLUMNS = {
         "last_success_at": "DATETIME",
         "status": "TEXT",
         "updated_at": "DATETIME",
+    },
+    "agent_daily_signal": {
+        "id": "INTEGER",
+        "trading_date": "TEXT",
+        "vt_symbol": "TEXT",
+        "signal_version": "TEXT",
+        "daily_agent_signal": "REAL",
+        "daily_direction": "TEXT",
+        "agent_label": "TEXT",
+        "raw_daily_signal": "REAL",
+        "news_count": "INTEGER",
+        "event_count": "INTEGER",
+        "model_count": "INTEGER",
+        "mixed_intensity": "REAL",
+        "risk_penalty": "REAL",
+        "created_at": "DATETIME",
     },
 }
 

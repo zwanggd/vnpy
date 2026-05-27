@@ -23,11 +23,17 @@ from vnpy_ctastrategy.backtesting import BacktestingEngine
 from strategies.macd_agent_strategy import MacdAgentStrategy
 
 DB_PATH = str(Path.home() / ".vntrader" / "database.db")
-AGENT_DB_PATH = str(Path.home() / ".vntrader" / "agent_news.db")
-RESULTS_DIR = str(Path(__file__).parent.parent / "results")
-os.makedirs(RESULTS_DIR, exist_ok=True)
+_AGENT_DB_PATH = str(Path.home() / ".vntrader" / "agent_news.db")
+_RESULTS_DIR = str(Path(__file__).parent.parent / "results")
+_VT_SYMBOL = "300750.SZSE"
 
-VT_SYMBOL = "300750.SZSE"
+AGENT_DB_PATH = _AGENT_DB_PATH
+RESULTS_DIR = _RESULTS_DIR
+VT_SYMBOL = _VT_SYMBOL
+SYMBOL = "300750"
+EXCHANGE = "SZSE"
+
+os.makedirs(RESULTS_DIR, exist_ok=True)
 START = datetime(2020, 1, 1)
 END = datetime(2026, 5, 15)
 FAST, SLOW, SIG = 12, 26, 9
@@ -67,8 +73,9 @@ def load_bars_from_db():
     db = sqlite3.connect(DB_PATH)
     rows = db.execute(
         "SELECT datetime, open_price, high_price, low_price, close_price, volume "
-        "FROM dbbardata WHERE symbol='300750' AND exchange='SZSE' "
-        "AND interval='d' ORDER BY datetime"
+        "FROM dbbardata WHERE symbol=? AND exchange=? "
+        "AND interval='d' ORDER BY datetime",
+        (SYMBOL, EXCHANGE),
     ).fetchall()
     db.close()
     return [{"dt": datetime.fromisoformat(r[0]), "open": r[1], "high": r[2],
@@ -543,6 +550,22 @@ def task3_ma_filters():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Comprehensive audit for either_safe MACD+Agent strategy")
+    parser.add_argument("--vt-symbol", default="300750.SZSE", help="Trading symbol (default: 300750.SZSE)")
+    parser.add_argument("--exchange", default="SZSE", help="Exchange (default: SZSE)")
+    parser.add_argument("--db-path", default="~/.vntrader/agent_news.db", help="Agent news database path")
+    args = parser.parse_args()
+
+    VT_SYMBOL = args.vt_symbol
+    parts = VT_SYMBOL.split(".")
+    SYMBOL = parts[0]
+    EXCHANGE = parts[1] if len(parts) > 1 else args.exchange
+    AGENT_DB_PATH = str(Path(args.db_path).expanduser())
+    RESULTS_DIR = str(Path(__file__).parent.parent / "results" / "v0.21" / SYMBOL / "audit")
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+
     wf("Starting audit_either_safe.py ...")
     task1_audit_agent_exits()
     task2_cost_sensitivity()

@@ -47,9 +47,10 @@ class MacdAgentStrategy(CtaTemplate):
     pos_ratio: float = 0.5
     agent_threshold: float = 0.05
     init_capital: float = 1_000_000
+    agent_db_path: str = ""
     parameters = [
         "fast", "slow", "signal_period", "signal_mode",
-        "pos_ratio", "agent_threshold", "init_capital",
+        "pos_ratio", "agent_threshold", "init_capital", "agent_db_path",
     ]
     variables = ["dif_val", "dea_val"]
 
@@ -68,7 +69,7 @@ class MacdAgentStrategy(CtaTemplate):
         self._last_entry_agent: bool = False
 
     def on_init(self) -> None:
-        self._agent_signals = load_agent_signals()
+        self._agent_signals = load_agent_signals(self.agent_db_path if self.agent_db_path else None)
         self.write_log(f"MACD-Agent init — mode={self.signal_mode}, "
                        f"agent_days={len(self._agent_signals)}")
         self.load_bar(50)

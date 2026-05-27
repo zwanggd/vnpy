@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 import urllib.parse
 from collections.abc import Callable
 from datetime import date, datetime
@@ -139,6 +140,11 @@ class CninfoAnnouncementSource(BaseNewsSource):
         fetch_errors: list[str] = []
 
         for page_num in range(1, MAX_PAGES + 1):
+            print(
+                f"  [cninfo] {query.symbol} page {page_num}...",
+                end="\r",
+                file=sys.stderr,
+            )
             form_pairs: list[tuple[str, str]] = [
                 ("pageNum", str(page_num)),
                 ("pageSize", str(PAGE_SIZE)),
@@ -201,6 +207,10 @@ class CninfoAnnouncementSource(BaseNewsSource):
             if page_before_start and announcements:
                 break
 
+        print(
+            f"  [cninfo] {query.symbol} done: {len(all_items)} items in {page_num} pages",
+            file=sys.stderr,
+        )
         if not _PDF_EXTRACTOR_AVAILABLE and _PDF_IMPORT_ERROR:
             fetch_errors.append(f"PDF extractor unavailable: {_PDF_IMPORT_ERROR}")
         error_summary = "; ".join(fetch_errors) if fetch_errors else ""

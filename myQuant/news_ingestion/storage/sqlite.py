@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
@@ -30,6 +31,11 @@ from myQuant.news_ingestion.contracts import (
 )
 from vnpy.trader.utility import get_file_path
 
+from myQuant.news_ingestion.storage.backup import backup_agent_db
+
+
+_last_backup_ts: dict[str, float] = {}
+_BACKUP_RATE_LIMIT_SECONDS: int = 600  # 10 minutes
 
 DEFAULT_AGENT_NEWS_DB_PATH = get_file_path("agent_news.db")
 
@@ -211,6 +217,7 @@ class AgentSignalModel(Model):
     source_item_id = TextField(null=True)
     prompt_version = TextField(null=True)
     schema_version = TextField(null=True)
+    signal_version = TextField(null=True)
     created_at = DateTimeField(null=True)
 
     class Meta:
@@ -237,6 +244,29 @@ class AgentSourceCursor(Model):
         indexes = ((("source", "scope_key", "window_start", "window_end"), True),)
 
 
+class AgentDailySignalModel(Model):
+    id = IntegerField(primary_key=True, constraints=[SQL("AUTOINCREMENT")])
+    trading_date = TextField(null=True)
+    vt_symbol = TextField(null=True)
+    signal_version = TextField(null=True)
+    daily_agent_signal = FloatField(null=True)
+    daily_direction = TextField(null=True)
+    agent_label = TextField(null=True)
+    raw_daily_signal = FloatField(null=True)
+    news_count = IntegerField(null=True)
+    event_count = IntegerField(null=True)
+    model_count = IntegerField(null=True)
+    mixed_intensity = FloatField(null=True)
+    risk_penalty = FloatField(null=True)
+    created_at = DateTimeField(null=True)
+
+    class Meta:
+        table_name = "agent_daily_signal"
+        indexes = (
+            (("trading_date", "vt_symbol", "signal_version"), True),
+        )
+
+
 AGENT_MODELS = (
     AgentBackfillRun,
     AgentStockProfile,
@@ -247,12 +277,18 @@ AGENT_MODELS = (
     AgentLLMOutput,
     AgentSignalModel,
     AgentSourceCursor,
+    AgentDailySignalModel,
 )
 
 
 class AgentNewsSqliteRepository:
-    def __init__(self, db_path: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        db_path: str | Path | None = None,
+        enable_backup: bool = True,
+    ) -> None:
         self._in_memory = db_path is None or (isinstance(db_path, str) and db_path == ":memory:")
+        self._enable_backup = enable_backup
         if self._in_memory:
             self.db_path: Path | None = None
             self.database = SqliteDatabase(":memory:")
@@ -261,6 +297,22 @@ class AgentNewsSqliteRepository:
             self.db_path = _resolve_db_path(db_path)
             self.database = SqliteDatabase(str(self.db_path))
         self._bind_models()
+        self._maybe_backup()
+
+    def _maybe_backup(self) -> None:
+        if self._in_memory or not self._enable_backup:
+            return
+        if self.db_path is None or not self.db_path.exists():
+            return
+
+        now = time.time()
+        key = str(self.db_path)
+        last_ts = _last_backup_ts.get(key, 0)
+        if now - last_ts < _BACKUP_RATE_LIMIT_SECONDS:
+            return
+
+        backup_agent_db(self.db_path)
+        _last_backup_ts[key] = now
 
     def _bind_models(self) -> None:
         self.database.bind(AGENT_MODELS, bind_refs=False, bind_backrefs=False)
@@ -361,6 +413,7 @@ class AgentNewsSqliteRepository:
             "source_item_id": signal.source_item_id,
             "prompt_version": signal.prompt_version,
             "schema_version": signal.schema_version,
+            "signal_version": signal.signal_version,
             "created_at": signal.created_at,
         }
         updates = dict(data)
@@ -382,6 +435,38 @@ class AgentNewsSqliteRepository:
             & (AgentSignalModel.vt_symbol == signal.vt_symbol)
             & (AgentSignalModel.event == signal.event)
             & (AgentSignalModel.relation_type == signal.relation_type.value)
+        )
+        return int(row.id)
+
+    def save_daily_signal(self, signal: dict) -> int:
+        self.initialize_schema()
+        data = {
+            "trading_date": signal.get("trading_date"),
+            "vt_symbol": signal.get("vt_symbol"),
+            "signal_version": signal.get("signal_version"),
+            "daily_agent_signal": signal.get("daily_agent_signal"),
+            "daily_direction": signal.get("daily_direction"),
+            "agent_label": signal.get("agent_label"),
+            "raw_daily_signal": signal.get("raw_daily_signal"),
+            "news_count": signal.get("news_count", 0),
+            "event_count": signal.get("event_count", 0),
+            "model_count": signal.get("model_count", 0),
+            "mixed_intensity": signal.get("mixed_intensity", 0),
+            "risk_penalty": signal.get("risk_penalty", 1.0),
+            "created_at": datetime.now(),
+        }
+        AgentDailySignalModel.insert(data).on_conflict(
+            conflict_target=(
+                AgentDailySignalModel.trading_date,
+                AgentDailySignalModel.vt_symbol,
+                AgentDailySignalModel.signal_version,
+            ),
+            update=data,
+        ).execute()
+        row = AgentDailySignalModel.get(
+            (AgentDailySignalModel.trading_date == data["trading_date"])
+            & (AgentDailySignalModel.vt_symbol == data["vt_symbol"])
+            & (AgentDailySignalModel.signal_version == data["signal_version"])
         )
         return int(row.id)
 

@@ -14,6 +14,7 @@ class Source(Enum):
     CNINFO = "cninfo"
     CLS_TELEGRAPH = "cls_telegraph"
     EASTMONEY = "eastmoney"
+    SINA_FINANCE = "sina_finance"
 
 
 class SourceCategory(Enum):
@@ -261,6 +262,7 @@ class AgentSignal:
     schema_version: str
     symbol: str = ""
     exchange: str = ""
+    signal_version: str = ""
     created_at: datetime = field(default_factory=datetime.now)
 
     def __post_init__(self) -> None:

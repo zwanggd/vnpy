@@ -277,3 +277,32 @@ def test_llama_cpp_strips_thinking(mapped_news: MappedNews, news_item: RawNewsIt
     # Verify think tag was stripped from raw response
     assert "<think>" not in output.raw_response
     assert output.raw_response.strip().startswith("{")
+
+
+def test_prompt_contains_stock_profile(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    from myQuant.news_ingestion.contracts import StockProfile
+    profile = StockProfile(
+        vt_symbol="300750.SZSE",
+        name="宁德时代",
+        aliases=("CATL",),
+        industry=("新能源", "动力电池"),
+        products=("动力电池", "储能电池"),
+        upstream=("碳酸锂",),
+        downstream=("新能源汽车",),
+    )
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=profile)
+    assert "宁德时代" in prompt
+    assert "新能源" in prompt
+    assert "动力电池" in prompt
+    assert "碳酸锂" in prompt
+    assert "新能源汽车" in prompt
+    assert "未知" not in prompt
+
+
+def test_prompt_without_profile_has_unknown(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=None)
+    assert "未知" in prompt

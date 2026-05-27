@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from myQuant.news_ingestion.calendar import available_at_to_trading_date
 import re
 import uuid
 from dataclasses import asdict, is_dataclass
@@ -18,6 +19,7 @@ from myQuant.news_ingestion.contracts import (
     RawNewsItem,
     RelationType,
     Status,
+    StockProfile,
     TimeHorizon,
 )
 from myQuant.news_ingestion.recall.engine import MappedNews
@@ -49,6 +51,9 @@ class DeepSeekNewsEvaluator:
         use_completions_api: bool = False,
         strip_thinking: bool = False,
         provider: str = "deepseek",
+        skip_json_response_format: bool = False,
+        skip_thinking_disabled: bool = False,
+        enable_thinking_false: bool = False,
     ) -> None:
         self.client = client or self._default_client()
         self.model = model
@@ -59,6 +64,9 @@ class DeepSeekNewsEvaluator:
         self.use_completions_api = use_completions_api
         self.strip_thinking = strip_thinking
         self.provider = provider
+        self.skip_json_response_format = skip_json_response_format
+        self.skip_thinking_disabled = skip_thinking_disabled
+        self.enable_thinking_false = enable_thinking_false
         self.attempt_records: list[tuple[LLMRunRecord, LLMOutputRecord]] = []
 
     @staticmethod
@@ -88,13 +96,42 @@ class DeepSeekNewsEvaluator:
             **kwargs,
         )
 
+    @classmethod
+    def for_opencode_go(
+        cls,
+        model: str = "qwen3.5-plus",
+        **kwargs: Any,
+    ) -> DeepSeekNewsEvaluator:
+        """Factory for OpenCode Go API — all models on OpenAI-compatible endpoint."""
+        api_key = os.environ.get("OPENCODE_GO_API_KEY", "")
+        if not api_key:
+            raise ValueError("OPENCODE_GO_API_KEY environment variable is not set")
+
+        from openai import OpenAI
+
+        is_deepseek = model.startswith("deepseek")
+        is_qwen = "qwen" in model
+        kwargs.setdefault("skip_json_response_format", model.startswith("minimax"))
+        kwargs.setdefault("skip_thinking_disabled", not is_deepseek)
+        kwargs.setdefault("provider", "opencode-go")
+        kwargs.setdefault("enable_thinking_false", is_qwen)
+        return cls(
+            client=OpenAI(
+                base_url="https://opencode.ai/zen/go/v1",
+                api_key=api_key,
+            ),
+            model=model,
+            **kwargs,
+        )
+
     def evaluate(
         self,
         mapped_news: MappedNews,
         news_item: RawNewsItem,
+        profile: StockProfile | None = None,
     ) -> tuple[LLMRunRecord, LLMOutputRecord, AgentSignal | None]:
         self.attempt_records = []
-        prompt = self._build_prompt(mapped_news, news_item)
+        prompt = self._build_prompt(mapped_news, news_item, profile=profile)
         messages: list[dict[str, str]] = [{"role": "user", "content": prompt}]
         full_prompt = prompt
         input_hash = self._hash_text(prompt)
@@ -121,14 +158,19 @@ class DeepSeekNewsEvaluator:
                             flags=re.DOTALL,
                         )
                 else:
-                    response = self.client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        temperature=self.temperature,
-                        max_tokens=self.max_tokens,
-                        response_format={"type": "json_object"},
-                        extra_body={"thinking": {"type": "disabled"}},
-                    )
+                    create_kwargs: dict[str, Any] = {
+                        "model": self.model,
+                        "messages": messages,
+                        "temperature": self.temperature,
+                        "max_tokens": self.max_tokens,
+                    }
+                    if not self.skip_json_response_format:
+                        create_kwargs["response_format"] = {"type": "json_object"}
+                    if not self.skip_thinking_disabled:
+                        create_kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
+                    elif self.enable_thinking_false:
+                        create_kwargs["extra_body"] = {"enable_thinking": False}
+                    response = self.client.chat.completions.create(**create_kwargs)
                     raw_response = str(response.choices[0].message.content or "")
 
                 token_usage = self._extract_usage(response)
@@ -191,7 +233,17 @@ class DeepSeekNewsEvaluator:
                     continue
                 return run, output, None
 
-    def _build_prompt(self, mapped_news: MappedNews, news_item: RawNewsItem) -> str:
+    def _build_prompt(self, mapped_news: MappedNews, news_item: RawNewsItem, profile: StockProfile | None = None) -> str:
+        name = profile.name if profile else "未知"
+        industry = ", ".join(profile.industry) if profile and profile.industry else "未知"
+        products = ", ".join(profile.products) if profile and profile.products else "未知"
+        if profile:
+            up = ", ".join(profile.upstream) if profile.upstream else ""
+            down = ", ".join(profile.downstream) if profile.downstream else ""
+            supply = f"{up} | {down}" if up or down else "未知"
+        else:
+            supply = "未知"
+
         return "\n".join(
             (
                 "你是A股新闻影响评估助手。请只输出合法JSON，不要输出Markdown。",
@@ -201,10 +253,10 @@ class DeepSeekNewsEvaluator:
                 f"股票vt_symbol：{mapped_news.vt_symbol}",
                 f"股票代码：{mapped_news.symbol}",
                 f"交易所：{mapped_news.exchange}",
-                "股票名称：未知",
-                "行业：未知",
-                "产品：未知",
-                "上游/下游：未知",
+                f"股票名称：{name}",
+                f"行业：{industry}",
+                f"产品：{products}",
+                f"上游/下游：{supply}",
                 f"召回关系提示：{mapped_news.relation_hint.value}",
                 "输出JSON字段：event, relation_type, impact_direction, impact_strength, time_horizon, confidence, reason, evidence。",
                 "relation_type只能是direct_company|supply_chain|industry|macro_policy|market_sentiment|risk_event|unknown。",
@@ -237,9 +289,11 @@ class DeepSeekNewsEvaluator:
             params = {
                 "temperature": self.temperature,
                 "max_tokens": self.max_tokens,
-                "response_format": {"type": "json_object"},
-                "extra_body": {"thinking": {"type": "disabled"}},
             }
+            if not self.skip_json_response_format:
+                params["response_format"] = {"type": "json_object"}
+            if not self.skip_thinking_disabled:
+                params["extra_body"] = {"thinking": {"type": "disabled"}}
         run = LLMRunRecord(
             run_id=run_id,
             raw_news_id=mapped_news.raw_news_id,
@@ -287,17 +341,43 @@ class DeepSeekNewsEvaluator:
             evidence=[str(parsed_json["evidence"])],
             published_at=published_at,
             available_at=available_at,
-            trading_date=available_at.date().isoformat(),
+            trading_date=available_at_to_trading_date(available_at),
             source=news_item.source,
             source_item_id=news_item.source_item_id,
             prompt_version=self.prompt_version,
             schema_version=self.schema_version,
         )
 
+    @staticmethod
+    def _extract_json(text: str) -> str:
+        """Extract JSON from potentially noisy model output.
+
+        Handles: markdown code fences, leading/trailing text, empty response.
+        """
+        stripped = text.strip()
+        if not stripped:
+            return ""
+
+        # Strip markdown code fences: ```json ... ``` or ``` ... ```
+        fence_match = re.match(r"```(?:json)?\s*\n?(.*?)\n?```", stripped, re.DOTALL)
+        if fence_match:
+            stripped = fence_match.group(1).strip()
+
+        # Find the first JSON object in the text
+        brace_start = stripped.find("{")
+        brace_end = stripped.rfind("}")
+        if brace_start != -1 and brace_end > brace_start:
+            return stripped[brace_start : brace_end + 1]
+
+        return stripped
+
     def _parse_and_validate(self, raw_response: str) -> tuple[dict[str, Any], tuple[str, ...]]:
         errors: list[str] = []
+        clean = self._extract_json(raw_response)
+        if not clean:
+            return {}, ("empty response after extraction",)
         try:
-            parsed = json.loads(raw_response)
+            parsed = json.loads(clean)
         except json.JSONDecodeError as exc:
             return {}, (f"invalid JSON: {exc.msg}",)
         if not isinstance(parsed, dict):

@@ -57,12 +57,22 @@ lab/
 *.pickle
 *.pkl
 backtests/results/
+docs/current_pipeline_audit_result.md
+docs/current_pipeline_io_audit.json
 
 # --- Sisyphus session state (keep plans) ---
 .sisyphus/boulder.json*
 .sisyphus/resume.md
 .sisyphus/run-continuation
 .sisyphus/drafts/
+.sisyphus/evidence/
+.sisyphus/notepads/
+
+# --- Agent tools ---
+.agent-memory/
+.agents/
+.archive/
+.claude/skills/
 
 # --- Qwen benchmark outputs ---
 qwen-benchmark/results/

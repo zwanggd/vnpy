@@ -111,7 +111,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--llm-provider",
         default="deepseek",
-        choices=["deepseek", "llama_cpp"],
+        choices=["deepseek", "llama_cpp", "opencode-go"],
         help="LLM backend provider (default: deepseek)",
     )
     parser.add_argument(
@@ -218,6 +218,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 base_url=base_url,
                 model=model,
             )
+            do_skip_llm = False
+        elif args.llm_provider == "opencode-go":
+            from myQuant.news_ingestion.llm.evaluator import DeepSeekNewsEvaluator  # noqa: E402
+
+            model = args.llm_model or "qwen3.5-plus"
+            evaluator = DeepSeekNewsEvaluator.for_opencode_go(model=model)
             do_skip_llm = False
     elif args.no_skip_llm and args.dry_run:
         print(

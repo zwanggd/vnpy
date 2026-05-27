@@ -123,6 +123,30 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         macro_factors=("金价", "铜价", "美元", "地缘政治"),
         risk_keywords=("矿山安全", "资源国政策", "金属价格下跌"),
     ),
+
+    "688256.SSE": StockProfile(
+        vt_symbol="688256.SSE",
+        name="寒武纪",
+        aliases=("寒武纪", "Cambricon", "688256"),
+        industry=("半导体", "AI芯片", "集成电路"),
+        products=("智能处理器IP", "云端智能芯片", "边缘智能芯片"),
+        upstream=("台积电", "中芯国际", "EDA工具"),
+        downstream=("AI服务器", "云计算", "智能驾驶"),
+        macro_factors=("半导体周期", "中美科技摩擦", "AI产业政策", "国产替代"),
+        risk_keywords=("美国制裁", "实体清单", "研发投入大", "盈利不稳定", "客户集中"),
+    ),
+
+    "600900.SSE": StockProfile(
+        vt_symbol="600900.SSE",
+        name="长江电力",
+        aliases=("长江电力", "Yangtze Power", "600900"),
+        industry=("电力", "水力发电", "清洁能源"),
+        products=("水电发电", "配售电", "抽水蓄能"),
+        upstream=("三峡集团", "水电站建设", "机组设备"),
+        downstream=("电网公司", "国家电网", "南方电网"),
+        macro_factors=("来水量", "气候", "电价政策", "利率", "碳排放交易"),
+        risk_keywords=("来水偏枯", "电价下调", "巨额折旧", "水库移民", "环保约束"),
+    ),
 }
 
 

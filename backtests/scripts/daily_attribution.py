@@ -4,6 +4,7 @@ Daily position attribution: either_safe vs macd_only on CATL (300750.SZSE).
 Simulates both strategies outside VNPY for exact position tracking,
 then computes attribution by bucket.
 """
+import argparse
 import sqlite3
 import csv
 import os
@@ -12,15 +13,20 @@ from datetime import date, datetime
 from pathlib import Path
 
 
-# ── Config ────────────────────────────────────────────────────────
+# ── Config (defaults, overridden by CLI args) ─────────────────────
 PRICE_DB = str(Path.home() / ".vntrader" / "database.db")
-AGENT_DB = str(Path.home() / ".vntrader" / "agent_news.db")
-OUTDIR = str(Path(__file__).parent.parent / "results")
-SYMBOL = "300750"
-EXCHANGE = "SZSE"
+_AGENT_DB = str(Path.home() / ".vntrader" / "agent_news.db")
+_OUTDIR = str(Path(__file__).parent.parent / "results")
+_SYMBOL = "300750"
+_EXCHANGE = "SZSE"
 FAST, SLOW, SIG_PERIOD = 12, 26, 9
 AGENT_THRESHOLD = 0.05
-INIT_SIZE = 100  # bars needed for MACD warm-up (max(slow*3, 100))
+INIT_SIZE = 100
+
+AGENT_DB = _AGENT_DB
+OUTDIR = _OUTDIR
+SYMBOL = _SYMBOL
+EXCHANGE = _EXCHANGE
 
 os.makedirs(OUTDIR, exist_ok=True)
 
@@ -204,6 +210,19 @@ def simulate_strategy(bars, dif, dea, agent_signals, mode):
 
 # ── 6. Main computation ──────────────────────────────────────────
 def main():
+    parser = argparse.ArgumentParser(description="Daily position attribution: either_safe vs macd_only")
+    parser.add_argument("--symbol", default="300750", help="Trading symbol (default: 300750)")
+    parser.add_argument("--exchange", default="SZSE", help="Exchange (default: SZSE)")
+    parser.add_argument("--db-path", default="~/.vntrader/agent_news.db", help="Agent news database path")
+    args = parser.parse_args()
+
+    global SYMBOL, EXCHANGE, AGENT_DB, OUTDIR
+    SYMBOL = args.symbol
+    EXCHANGE = args.exchange
+    AGENT_DB = str(Path(args.db_path).expanduser())
+    OUTDIR = str(Path(__file__).parent.parent / "results" / "v0.21" / SYMBOL / "attribution")
+    os.makedirs(OUTDIR, exist_ok=True)
+
     print("Loading bars...")
     bars = load_bars()
     print(f"  Loaded {len(bars)} bars: {bars[0]['date']} → {bars[-1]['date']}")
