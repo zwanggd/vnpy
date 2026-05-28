@@ -61,6 +61,7 @@ lab/
 *.hdf5
 *.pickle
 *.pkl
+results/
 backtests/results/
 docs/pipeline/current_pipeline_audit_result.md
 docs/pipeline/current_pipeline_io_audit.json
