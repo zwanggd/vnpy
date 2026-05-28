@@ -47,6 +47,7 @@ def _default_source_factory(source: Source) -> BaseNewsSource:
     from myQuant.news_ingestion.sources.cninfo import CninfoAnnouncementSource
     from myQuant.news_ingestion.sources.cls import ClsTelegraphSource
     from myQuant.news_ingestion.sources.eastmoney import EastmoneyNewsSource
+    from myQuant.news_ingestion.sources.sina import SinaFinanceSource
 
     if source == Source.CNINFO:
         return CninfoAnnouncementSource()
@@ -54,6 +55,8 @@ def _default_source_factory(source: Source) -> BaseNewsSource:
         return ClsTelegraphSource()
     if source == Source.EASTMONEY:
         return EastmoneyNewsSource()
+    if source == Source.SINA_FINANCE:
+        return SinaFinanceSource()
     raise ValueError(f"Unknown source: {source}")
 
 

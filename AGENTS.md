@@ -1,6 +1,153 @@
 # AGENTS.md — vnpy/myQuant Agent Trading
 
+**Generated:** 2026-05-28T03:08:48Z
+**Commit:** 48d51bde
+**Branch:** master
+
 > 所有任务默认遵守。非关键工作可自行判断，关键工作和破坏性操作必须走完流程。
+
+## OVERVIEW
+VeighNa (vnpy) v4.4.0 — Python 量化交易系统开发框架，with custom myQuant agent pipeline for news-driven trading signals. Core stack: Python 3.12, PySide6, numpy/pandas, PyTorch/LightGBM (alpha), SQLite (Peewee ORM).
+
+## STRUCTURE
+```
+vnpy/               # 上游框架，不改 (published wheel, hatchling)
+├── trader/         # 核心交易引擎 (MainEngine, BaseGateway, BaseApp, OMS)
+├── event/          # 事件驱动引擎 (EventEngine, 145行)
+├── alpha/          # AI/ML 量化投研 (dataset → model → strategy → lab)
+├── chart/          # K线图表 (PyQt6)
+└── rpc/            # 跨进程通讯 (ZMQ)
+myQuant/            # 我们的代码 (source-only, ~7.9K行)
+├── news_ingestion/ # ★ 核心模块 (~4.5K行): sources, storage, llm, scoring, recall
+├── data/           # ORM models (Peewee, 10 tables, agent_ prefix)
+├── agent/          # → news_ingestion.llm (alias)
+├── backtest/       # → news_ingestion.reporting (alias)
+├── core/           # → news_ingestion contracts + calendar (alias)
+├── news/           # → news_ingestion.sources + recall (alias)
+├── pipeline/       # → news_ingestion.pipeline (alias)
+├── scoring/        # → news_ingestion.scoring (alias)
+└── strategies/     # placeholder (空)
+strategies/         # standalone 策略包 (source-only): MacdAgentStrategy, TechAgentStrategy
+backtests/          # 回测脚本 + 结果 (no __init__.py)
+scripts/            # 运维脚本 (audit_current_pipeline.py)
+examples/           # vnpy示例 + alpha_research notebooks
+docs/pipeline/      # 内部文档: pipeline contracts, audits, migration
+archive/            # git-ignored, 历史参考, 勿用
+.sisyphus/          # Agent planning & execution (plans/, drafts/, evidence/)
+```
+
+## WHERE TO LOOK
+
+| Task | Location | Notes |
+|------|----------|-------|
+| 启动 myQuant | `myQuant/run.py` | `PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python myQuant/run.py` |
+| 启动 vnpy GUI | `examples/veighna_trader/run.py` | CTP + CTAStrategy + CtaBacktester + DataManager |
+| 无界面运行 | `examples/no_ui/run.py` | Headless CTA daemon, multi-process |
+| 新闻数据管道 | `myQuant/news_ingestion/scripts/{fetch,evaluate,generate}*.py` | 3-stage: fetch → LLM → daily signals |
+| 回测矩阵 | `backtests/run_matrix.py` | `--phase {1,2,3}` 技术×代理矩阵 |
+| Pipeline审计 | `scripts/audit_current_pipeline.py` | 17项检查, DB+signal文件 |
+| 策略开发 | `strategies/` | CtaTemplate基类, MacdAgentStrategy参考 |
+| LLM评估 | `myQuant/news_ingestion/llm/evaluator.py` | DeepSeekNewsEvaluator |
+| 数据模型 | `myQuant/data/models.py` | Peewee ORM, 10表, agent_前缀 |
+| 数据库仓储 | `myQuant/news_ingestion/storage/sqlite.py` | AgentNewsSqliteRepository |
+| Pipeline契约 | `docs/pipeline/pipeline_contract_v0_22.md` | I/O schema, dedup, 版本追踪 |
+| 回测真实度 | `docs/backtest/realism_audit.md` | 手续费/滑点/涨跌停/流动性/成交价/市场冲击 |
+| 策略审计 | `docs/backtest/strategy_matrix_audit_v0_25.md` | 策略类、指标、mode 完整清单 |
+| AI投研 | `examples/alpha_research/research_workflow_lgb.ipynb` | LightGBM研究流程 |
+| CI/CD | `.github/workflows/pythonapp.yml` | ruff → mypy → uv build (windows-latest) |
+
+## COMMANDS
+
+```bash
+# 启动
+PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python myQuant/run.py
+
+# 回测
+PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python backtests/run_matrix.py --phase 1
+PYTHONDONTWRITEBYTECODE=1 conda run -n vnpy43 python backtests/run_macd_agent_tests.py --symbol 300750.SZSE
+
+# 数据管道
+python myQuant/news_ingestion/scripts/fetch_news.py --start 2026-01-01 --end 2026-05-01 --symbols XXX --agent-db-path ~/.vntrader/agent_news.db
+python myQuant/news_ingestion/scripts/evaluate_news.py --db-path ~/.vntrader/agent_news.db --provider deepseek
+python myQuant/news_ingestion/scripts/generate_daily_signals.py --db-path ~/.vntrader/agent_news.db --vt-symbol 300750.SZSE
+
+# 审计
+python scripts/audit_current_pipeline.py
+
+# Lint & Type Check
+ruff check .
+mypy vnpy
+
+# 安装
+pip install -e .[alpha,dev]               # 可编辑安装(含ML依赖)
+bash install_osx.sh                        # macOS
+
+# 测试
+pytest                                     # 全部测试
+pytest myQuant/                            # myQuant only
+AGENT_NEWS_LIVE_TEST=1 pytest myQuant/news_ingestion/tests/test_live_sources.py -v
+```
+
+## CONVENTIONS
+- **Lint**: ruff (B, E, F, UP, W), E501 ignored (行长度不限制)
+- **Type check**: mypy strict — `disallow_untyped_defs=true`, `disallow_incomplete_defs=true`
+- **Types**: Python 3.10+ union syntax (`str | None`, not `Optional[str]`)
+- **Imports**: stdlib → third-party → local; `collections.abc` > `typing`; relative within package
+- **Docs**: """""" constructor docstrings (vnpy convention); English docstrings, short sentences
+- **Names**: PascalCase classes, snake_case functions, SCREAMING_SNAKE constants, `_private` attrs
+- **Data**: @dataclass + __post_init__ for computed fields (e.g. vt_symbol)
+- **ABC**: ABC/ABCMeta for base classes (BaseGateway, BaseEngine, AlphaModel)
+- **i18n**: `from .locale import _`; `_("Chinese text")` pattern
+- **Logging**: loguru (not stdlib), format: `{time} | {level} | {gateway} | {message}`
+- **ORM**: Peewee (myQuant), upsert for all save operations, `TextField` for JSON blobs
+- **DB**: Two systems — upstream `BaseDatabase` (raw SQL) + myQuant `AgentNewsSqliteRepository` (Peewee)
+- **Backup**: Auto-backup on `AgentNewsSqliteRepository` construction, 10min rate-limit, SQLite native API
+- **Config**: `~/.vntrader/vt_setting.json` (JSON), no .env/.ini/.yaml
+- **Env vars**: API keys only (DEEPSEEK_API_KEY, OPENCODE_GO_API_KEY), test flag (AGENT_NEWS_LIVE_TEST)
+- **Build**: hatchling, only `vnpy/` packaged; `myQuant/` and `strategies/` source-only
+
+## UNIQUE STYLES
+- `vt_` prefix computed IDs: `vt_symbol = f"{symbol}.{exchange.value}"`
+- Event strings: `"eTick."`, `"eTrade."` (e + PascalCase + .)
+- Empty `""""""` constructor docstrings — project-wide convention
+- `# noqa` for side-effect imports (ruff false positives)
+- `TYPE_CHECKING` guard for circular import avoidance
+- Alias facade pattern in myQuant: 7 sub-packages re-export from `news_ingestion/`
+
+## NOTES
+- `vnpy/` 只读, `myQuant/` 可改 — AGENTS.md 明确边界
+- `archive/` git-ignored, 历史参考, 不要搜索或修改
+- `strategies/` 和 `backtests/` 不在 pyproject.toml build 中 — 仅源码存在
+- 双数据库系统: 行情库 (`database.db`, `BaseDatabase`) + 代理库 (`agent_news*.db`, Peewee)
+- `AgentNewsSqliteRepository` 构造时自动备份到 `~/.vntrader/backups/`
+- llama.cpp 模型路径: `/Users/kai/.lmstudio/models/lmstudio-community/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf`
+- `myQuant/__init__.py` 不可导入子模块 — 循环导入风险
+- 回测引擎 (`BacktestingEngine`) 来自 vnpy_ctastrategy (CTA), 非 vnpy.alpha
+- 策略信号从 `~/.vntrader/agent_news.db` 读取 `agent_daily_signal` 表
+- 回测真实度审计: [docs/backtest/realism_audit.md](docs/backtest/realism_audit.md)
+
+## NEWS SOURCES
+
+| Source | Endpoint | Content | Speed | Status |
+|--------|----------|---------|-------|--------|
+| Eastmoney | `search-api-web.eastmoney.com` | 财经新闻摘要, 120-140字 | ~70s/股全量 | ✅ 主力 |
+| Sina | `vip.stock.finance.sina.com.cn` | 个股新闻全文, 需逐篇爬取 | 慢 | ✅ 已接入 |
+| CNInfo | 巨潮资讯网 | 官方公告 (PDF) | — | ⚠️ 含pdfplumber依赖, 未启用 |
+| CLS | 财联社 | 实时电报, API时间倒排 | — | ⚠️ 不适合历史回填 |
+
+## LLM PROVIDERS
+
+| Provider | Endpoint | Key Env | Default Model | json_object |
+|----------|----------|---------|---------------|:---:|
+| deepseek | `api.deepseek.com/v1` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` | ✅ |
+| opencode-go | `opencode.ai/zen/go/v1` | `OPENCODE_GO_API_KEY` | `qwen3.5-plus` | ✅ |
+| llama_cpp | localhost:8080 | — | Qwen3.6-35B-A3B | ⚠️ |
+
+## KNOWN TODOS
+- [x] Prompt 接入 StockProfile + company_archetype
+- [x] v0.25 strategy matrix + buy_and_hold + reporting
+- [ ] CNInfo PDF 提取方案评估
+- [ ] `both_consensus` 和 `macd_confirmed` 策略结果完全相同 — 审计参数差异
 
 ## Rule 1 — Think Before Coding
 - 明确假设，不确定就问，别猜。

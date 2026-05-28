@@ -306,3 +306,93 @@ def test_prompt_without_profile_has_unknown(mapped_news: MappedNews, news_item: 
     evaluator = DeepSeekNewsEvaluator(client=client)
     prompt = evaluator._build_prompt(mapped_news, news_item, profile=None)
     assert "未知" in prompt
+
+
+def test_prompt_with_archetype_includes_snippet(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    """Profile with cyclical_chemical archetype → prompt contains chemical-specific guidance."""
+    from myQuant.news_ingestion.contracts import StockProfile
+
+    profile = StockProfile(
+        vt_symbol="600309.SSE",
+        name="万华化学",
+        company_archetype="cyclical_chemical",
+    )
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=profile)
+
+    assert "公司类型：cyclical_chemical" in prompt
+    assert "公司类型版本" in prompt
+    assert "该类型公司新闻评估重点" in prompt
+    assert "产品价格" in prompt
+    assert "价差" in prompt
+    # Original JSON fields still present
+    assert "event" in prompt
+    assert "relation_type" in prompt
+    assert "impact_direction" in prompt
+    assert "impact_strength" in prompt
+    assert "time_horizon" in prompt
+    assert "confidence" in prompt
+    assert "reason" in prompt
+    assert "evidence" in prompt
+
+
+def test_prompt_archetype_fallback_to_generic(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    """Unknown archetype → prompt uses generic snippet."""
+    from myQuant.news_ingestion.contracts import StockProfile
+
+    profile = StockProfile(
+        vt_symbol="TEST.SSE",
+        name="Test",
+        company_archetype="nonexistent_type_xyz",
+    )
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=profile)
+
+    assert "公司类型：nonexistent_type_xyz" in prompt
+    # Should have generic snippet content
+    assert "直接业务关联" in prompt
+
+
+def test_prompt_with_profile_no_archetype_uses_generic(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    """Profile without explicit company_archetype → uses generic."""
+    from myQuant.news_ingestion.contracts import StockProfile
+
+    profile = StockProfile(vt_symbol="TEST.SSE", name="Test")
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=profile)
+
+    assert "公司类型：generic" in prompt
+    assert "直接业务关联" in prompt
+
+
+def test_prompt_archetype_prompt_version(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    """Evaluator with archetype-aware prompt has updated prompt_version."""
+    from myQuant.news_ingestion.contracts import StockProfile
+
+    profile = StockProfile(
+        vt_symbol="600309.SSE",
+        name="万华化学",
+        company_archetype="cyclical_chemical",
+    )
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    assert "archetype" in evaluator.prompt_version
+
+    run, _, signal = evaluator.evaluate(mapped_news, news_item, profile=profile)
+    assert "archetype" in run.prompt_version
+
+
+def test_prompt_without_profile_no_archetype_block(mapped_news: MappedNews, news_item: RawNewsItem) -> None:
+    """Profile=None → prompt should NOT contain archetype block."""
+    client = FakeClient([valid_payload()])
+    evaluator = DeepSeekNewsEvaluator(client=client)
+    prompt = evaluator._build_prompt(mapped_news, news_item, profile=None)
+
+    assert "公司类型" not in prompt
+    assert "公司类型版本" not in prompt
+    assert "该类型公司新闻评估重点" not in prompt
+    # Original JSON fields still present
+    assert "event" in prompt

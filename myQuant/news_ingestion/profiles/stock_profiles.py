@@ -23,6 +23,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("地产", "消费电子", "家电渠道"),
         macro_factors=("地产政策", "消费刺激", "出口汇率"),
         risk_keywords=("原材料涨价", "海外需求下滑", "汇率波动"),
+        company_archetype="consumer_moat",
     ),
     "002475.SZSE": StockProfile(
         vt_symbol="002475.SZSE",
@@ -34,6 +35,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("苹果", "消费电子", "汽车电子"),
         macro_factors=("苹果销量", "消费电子周期", "出口管制"),
         risk_keywords=("客户集中", "苹果砍单", "毛利率下滑"),
+        company_archetype="advanced_manufacturing",
     ),
     "002594.SZSE": StockProfile(
         vt_symbol="002594.SZSE",
@@ -45,6 +47,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("汽车销售", "出口", "储能"),
         macro_factors=("新能源补贴", "双碳", "欧洲电动车政策"),
         risk_keywords=("价格战", "产能过剩", "出口关税"),
+        company_archetype="new_energy_chain",
     ),
     "300750.SZSE": StockProfile(
         vt_symbol="300750.SZSE",
@@ -56,6 +59,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("新能源汽车", "特斯拉", "比亚迪", "蔚来", "理想", "小鹏", "储能电站"),
         macro_factors=("新能源补贴", "双碳", "出口管制", "欧洲电动车政策"),
         risk_keywords=("价格战", "产能过剩", "毛利率下滑", "电池安全", "客户流失"),
+        company_archetype="new_energy_chain",
     ),
     "600036.SSE": StockProfile(
         vt_symbol="600036.SSE",
@@ -67,6 +71,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("居民消费", "房地产", "企业信贷"),
         macro_factors=("利率政策", "房地产政策", "存款利率"),
         risk_keywords=("不良贷款", "净息差收窄", "地产风险"),
+        company_archetype="financial",
     ),
     "600276.SSE": StockProfile(
         vt_symbol="600276.SSE",
@@ -78,6 +83,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("医院", "医保", "药店"),
         macro_factors=("医保谈判", "集采", "药监审批"),
         risk_keywords=("集采降价", "研发失败", "专利到期"),
+        company_archetype="healthcare_innovation",
     ),
     "600309.SSE": StockProfile(
         vt_symbol="600309.SSE",
@@ -89,6 +95,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("建筑", "家电", "汽车", "鞋服"),
         macro_factors=("地产政策", "油价", "环保限产"),
         risk_keywords=("化工品价格下跌", "需求下滑", "安全事故"),
+        company_archetype="cyclical_chemical",
     ),
     "600519.SSE": StockProfile(
         vt_symbol="600519.SSE",
@@ -100,6 +107,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("经销商", "消费", "宴席"),
         macro_factors=("消费政策", "反腐", "居民收入"),
         risk_keywords=("批价下跌", "渠道库存", "消费降级"),
+        company_archetype="consumer_moat",
     ),
     "601318.SSE": StockProfile(
         vt_symbol="601318.SSE",
@@ -111,6 +119,7 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("居民保障", "企业保险"),
         macro_factors=("利率政策", "资本市场", "房地产"),
         risk_keywords=("投资亏损", "保费下滑", "地产敞口"),
+        company_archetype="financial",
     ),
     "601899.SSE": StockProfile(
         vt_symbol="601899.SSE",
@@ -122,8 +131,8 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("铜需求", "新能源", "贵金属投资"),
         macro_factors=("金价", "铜价", "美元", "地缘政治"),
         risk_keywords=("矿山安全", "资源国政策", "金属价格下跌"),
+        company_archetype="cyclical_resource",
     ),
-
     "688256.SSE": StockProfile(
         vt_symbol="688256.SSE",
         name="寒武纪",
@@ -134,8 +143,8 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("AI服务器", "云计算", "智能驾驶"),
         macro_factors=("半导体周期", "中美科技摩擦", "AI产业政策", "国产替代"),
         risk_keywords=("美国制裁", "实体清单", "研发投入大", "盈利不稳定", "客户集中"),
+        company_archetype="growth_concept",
     ),
-
     "600900.SSE": StockProfile(
         vt_symbol="600900.SSE",
         name="长江电力",
@@ -146,8 +155,11 @@ DEFAULT_STOCK_PROFILES: dict[str, StockProfile] = {
         downstream=("电网公司", "国家电网", "南方电网"),
         macro_factors=("来水量", "气候", "电价政策", "利率", "碳排放交易"),
         risk_keywords=("来水偏枯", "电价下调", "巨额折旧", "水库移民", "环保约束"),
+        company_archetype="utility_defensive",
     ),
 }
+
+
 
 
 def discover_vt_symbols_from_market_db(market_db_path: str | Path) -> list[str]:

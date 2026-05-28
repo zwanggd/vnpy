@@ -21,7 +21,7 @@ from myQuant.news_ingestion.storage import AgentNewsSqliteRepository
 from myQuant.news_ingestion.pipeline import BackfillPipeline, PipelineResult
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-CLI_SCRIPT = str(PROJECT_ROOT / "backtests" / "scripts" / "run_agent_news_backfill.py")
+CLI_SCRIPT = str(PROJECT_ROOT / "myQuant" / "news_ingestion" / "scripts" / "run_agent_news_backfill.py")
 
 CONDA_ENV = os.environ.copy()
 CONDA_ENV.setdefault("PYTHONPATH", str(PROJECT_ROOT))

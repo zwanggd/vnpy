@@ -1,4 +1,0 @@
-config_id,total,success,success_rate_pct,avg_latency_ms,p50_latency_ms,p90_latency_ms,avg_ttft_ms,avg_output_tokens,throughput_req_s,labels,wall_time_s,workers,prompt_id
-g2_w1,20,20,100.0,3796.0,3875.0,4596.0,524.0,111.0,0.26,"{""positive"": 3, ""neutral"": 14, ""negative"": 3}",75.9,1,A0
-g2_w4,20,20,100.0,9408.0,9106.0,11826.0,649.0,109.0,0.11,"{""positive"": 3, ""neutral"": 14, ""negative"": 3}",188.2,4,A0
-g2_w6,20,20,100.0,13260.0,14231.0,17458.0,4534.0,107.0,0.08,"{""positive"": 3, ""neutral"": 14, ""negative"": 3}",265.2,6,A0

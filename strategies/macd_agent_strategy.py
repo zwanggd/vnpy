@@ -3,7 +3,7 @@ MACD + Agent combined strategy with multiple signal modes.
 
 Modes (signal_mode parameter):
   macd_only     — pure MACD golden/death cross
-  agent_only    — daily_agent_signal >= threshold (direction only, no technical)
+  agent_only    — agent_daily_signal >= threshold (direction only, no technical)
   both_consensus — MACD golden cross AND agent positive → buy
   either_signal  — MACD golden cross OR agent positive → buy
   macd_confirmed — MACD golden cross, agent positive confirms (skip if agent disagrees)
@@ -25,7 +25,7 @@ def load_agent_signals(agent_db_path: str = None):
         agent_db_path = str(Path.home() / ".vntrader" / "agent_news.db")
     db = sqlite3.connect(agent_db_path)
     rows = db.execute(
-        "SELECT entry_date, daily_agent_signal, daily_direction FROM daily_agent_signal"
+        "SELECT trading_date, daily_agent_signal, daily_direction FROM agent_daily_signal"
     ).fetchall()
     db.close()
     result = {}
@@ -69,7 +69,12 @@ class MacdAgentStrategy(CtaTemplate):
         self._last_entry_agent: bool = False
 
     def on_init(self) -> None:
-        self._agent_signals = load_agent_signals(self.agent_db_path if self.agent_db_path else None)
+        self._agent_signals = {}
+        if self.agent_db_path and self.signal_mode != "macd_only":
+            try:
+                self._agent_signals = load_agent_signals(self.agent_db_path)
+            except Exception:
+                pass
         self.write_log(f"MACD-Agent init — mode={self.signal_mode}, "
                        f"agent_days={len(self._agent_signals)}")
         self.load_bar(50)

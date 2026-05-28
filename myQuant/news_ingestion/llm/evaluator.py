@@ -46,7 +46,7 @@ class DeepSeekNewsEvaluator:
         model: str = "deepseek-v4-flash",
         temperature: float = 0.0,
         max_tokens: int = 1024,
-        prompt_version: str = "news_impact_v1",
+        prompt_version: str = "news_impact_v1_archetype_v0.1",
         schema_version: str = "agent_signal_v1",
         use_completions_api: bool = False,
         strip_thinking: bool = False,
@@ -244,27 +244,42 @@ class DeepSeekNewsEvaluator:
         else:
             supply = "未知"
 
-        return "\n".join(
-            (
-                "你是A股新闻影响评估助手。请只输出合法JSON，不要输出Markdown。",
-                "任务：分析新闻对指定股票的影响，字段名必须使用英文。",
-                f"新闻标题：{news_item.title}",
-                f"新闻内容：{news_item.content}",
-                f"股票vt_symbol：{mapped_news.vt_symbol}",
-                f"股票代码：{mapped_news.symbol}",
-                f"交易所：{mapped_news.exchange}",
-                f"股票名称：{name}",
-                f"行业：{industry}",
-                f"产品：{products}",
-                f"上游/下游：{supply}",
-                f"召回关系提示：{mapped_news.relation_hint.value}",
-                "输出JSON字段：event, relation_type, impact_direction, impact_strength, time_horizon, confidence, reason, evidence。",
-                "relation_type只能是direct_company|supply_chain|industry|macro_policy|market_sentiment|risk_event|unknown。",
-                "impact_direction只能是positive|negative|neutral|mixed|unknown。",
-                "time_horizon只能是intraday|short|medium|long|unknown。",
-                "impact_strength和confidence必须是0.0到1.0之间的数字。reason用简短中文解释，evidence填写新闻中的关键句。",
-            )
-        )
+        lines: list[str] = [
+            "你是A股新闻影响评估助手。请只输出合法JSON，不要输出Markdown。",
+            "任务：分析新闻对指定股票的影响，字段名必须使用英文。",
+            f"新闻标题：{news_item.title}",
+            f"新闻内容：{news_item.content}",
+            f"股票vt_symbol：{mapped_news.vt_symbol}",
+            f"股票代码：{mapped_news.symbol}",
+            f"交易所：{mapped_news.exchange}",
+            f"股票名称：{name}",
+            f"行业：{industry}",
+            f"产品：{products}",
+            f"上游/下游：{supply}",
+            f"召回关系提示：{mapped_news.relation_hint.value}",
+        ]
+
+        if profile is not None:
+            from myQuant.agent.prompt_variants import get_archetype_prompt_snippet  # noqa: E402
+
+            archetype = getattr(profile, "company_archetype", "generic") or "generic"
+            archetype_version = getattr(profile, "company_archetype_version", "company_archetype_v0.1") or "company_archetype_v0.1"
+            snippet = get_archetype_prompt_snippet(archetype)
+            lines.extend([
+                f"公司类型：{archetype}",
+                f"公司类型版本：{archetype_version}",
+                f"该类型公司新闻评估重点：\n{snippet}",
+            ])
+
+        lines.extend([
+            "输出JSON字段：event, relation_type, impact_direction, impact_strength, time_horizon, confidence, reason, evidence。",
+            "relation_type只能是direct_company|supply_chain|industry|macro_policy|market_sentiment|risk_event|unknown。",
+            "impact_direction只能是positive|negative|neutral|mixed|unknown。",
+            "time_horizon只能是intraday|short|medium|long|unknown。",
+            "impact_strength和confidence必须是0.0到1.0之间的数字。reason用简短中文解释，evidence填写新闻中的关键句。",
+        ])
+
+        return "\n".join(lines)
 
     def _make_records(
         self,

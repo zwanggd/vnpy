@@ -1,4 +1,0 @@
-config_id,total,success,success_rate_pct,avg_latency_ms,p50_latency_ms,p90_latency_ms,avg_ttft_ms,avg_output_tokens,throughput_req_s,labels,wall_time_s,batch,ubatch,workers
-g5_b512_ub512,20,19,95.0,9817.0,9807.0,12763.0,903.0,102.0,0.1,"{""positive"": 3, ""neutral"": 12, ""negative"": 4}",196.3,512,512,4
-g5_b1024_ub1024,20,20,100.0,10327.0,10324.0,13002.0,932.0,106.0,0.1,"{""positive"": 3, ""neutral"": 13, ""negative"": 4}",206.5,1024,1024,4
-g5_b2048_ub2048,20,20,100.0,10526.0,9885.0,15113.0,912.0,111.0,0.1,"{""positive"": 3, ""neutral"": 13, ""negative"": 4}",210.5,2048,2048,4

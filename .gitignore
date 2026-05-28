@@ -21,6 +21,11 @@ build/
 dist/
 *.local
 
+# Agent tools
+.opencode/
+.sisyphus-debug/
+.pytest_cache/
+
 # VeighNa (market DB + agent DB)
 .vntrader/
 
@@ -57,8 +62,8 @@ lab/
 *.pickle
 *.pkl
 backtests/results/
-docs/current_pipeline_audit_result.md
-docs/current_pipeline_io_audit.json
+docs/pipeline/current_pipeline_audit_result.md
+docs/pipeline/current_pipeline_io_audit.json
 
 # --- Sisyphus session state (keep plans) ---
 .sisyphus/boulder.json*
@@ -70,15 +75,9 @@ docs/current_pipeline_io_audit.json
 
 # --- Agent tools ---
 .agent-memory/
-.agents/
 .archive/
-.claude/skills/
+.claude/
+.opencode/
 
-# --- Qwen benchmark outputs ---
-qwen-benchmark/results/
-qwen-benchmark/reports/
-qwen-benchmark/scripts/__pycache__/
-
-# --- Conda env ---
-.conda/
-*.conda
+# --- Archive (historical, not source) ---
+archive/

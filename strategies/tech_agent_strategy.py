@@ -40,7 +40,7 @@ def load_agent_signals(agent_db_path: str = None) -> dict:
         agent_db_path = str(Path.home() / ".vntrader" / "agent_news.db")
     db = sqlite3.connect(agent_db_path)
     rows = db.execute(
-        "SELECT entry_date, daily_agent_signal, daily_direction FROM daily_agent_signal"
+        "SELECT trading_date, daily_agent_signal, daily_direction FROM agent_daily_signal"
     ).fetchall()
     db.close()
     result = {}

@@ -21,8 +21,10 @@ EXPECTED_VT_SYMBOLS = [
     "600276.SSE",
     "600309.SSE",
     "600519.SSE",
+    "600900.SSE",
     "601318.SSE",
     "601899.SSE",
+    "688256.SSE",
 ]
 
 
@@ -46,17 +48,18 @@ def test_discover_symbols_from_market_db_overview(tmp_path: Path) -> None:
     create_market_db(
         market_db_path,
         [
-            ("600519", "SSE", "d"),
             ("000333", "SZSE", "d"),
-            ("300750", "SZSE", "d"),
-            ("600519", "SSE", "1m"),
-            ("601899", "SSE", "d"),
-            ("600276", "SSE", "d"),
             ("002475", "SZSE", "d"),
-            ("600309", "SSE", "d"),
             ("002594", "SZSE", "d"),
-            ("601318", "SSE", "d"),
+            ("300750", "SZSE", "d"),
             ("600036", "SSE", "d"),
+            ("600276", "SSE", "d"),
+            ("600309", "SSE", "d"),
+            ("600519", "SSE", "d"),
+            ("600900", "SSE", "d"),
+            ("601318", "SSE", "d"),
+            ("601899", "SSE", "d"),
+            ("688256", "SSE", "d"),
         ],
     )
 
@@ -77,7 +80,7 @@ def test_all_seed_profiles_can_be_saved_and_retrieved(tmp_path: Path) -> None:
     saved_symbols = persist_discovered_stock_profiles(repository, market_db_path)
 
     assert saved_symbols == EXPECTED_VT_SYMBOLS
-    assert repository.count("agent_stock_profile") == 10
+    assert repository.count("agent_stock_profile") == 12
     for vt_symbol in EXPECTED_VT_SYMBOLS:
         row = repository.get_stock_profile(vt_symbol)
         assert row is not None
@@ -117,4 +120,43 @@ def test_missing_profile_reports_symbol(tmp_path: Path) -> None:
             AgentNewsSqliteRepository(db_path=tmp_path / "agent_news.db"),
             market_db_path,
             profiles=incomplete_profiles,
+        )
+
+
+def test_stock_profile_backward_compat_no_archetype() -> None:
+    """StockProfile without company_archetype defaults to generic."""
+    from myQuant.news_ingestion.contracts import StockProfile
+
+    sp = StockProfile(vt_symbol="TEST.SSE", name="Test")
+    assert sp.company_archetype == "generic"
+    assert sp.company_archetype_version == "company_archetype_v0.1"
+
+
+def test_all_default_profiles_have_archetype() -> None:
+    for vt_symbol, profile in DEFAULT_STOCK_PROFILES.items():
+        assert profile.company_archetype != "generic", (
+            f"{vt_symbol} ({profile.name}) still has default generic archetype"
+        )
+        assert profile.company_archetype_version == "company_archetype_v0.1"
+
+
+def test_profile_archetype_matches_expected() -> None:
+    expected = {
+        "000333.SZSE": "consumer_moat",
+        "002475.SZSE": "advanced_manufacturing",
+        "002594.SZSE": "new_energy_chain",
+        "300750.SZSE": "new_energy_chain",
+        "600036.SSE": "financial",
+        "600276.SSE": "healthcare_innovation",
+        "600309.SSE": "cyclical_chemical",
+        "600519.SSE": "consumer_moat",
+        "600900.SSE": "utility_defensive",
+        "601318.SSE": "financial",
+        "601899.SSE": "cyclical_resource",
+        "688256.SSE": "growth_concept",
+    }
+    for vt_symbol, expected_archetype in expected.items():
+        profile = DEFAULT_STOCK_PROFILES[vt_symbol]
+        assert profile.company_archetype == expected_archetype, (
+            f"{vt_symbol} expected {expected_archetype}, got {profile.company_archetype}"
         )

@@ -1,4 +1,0 @@
-config_id,total,success,success_rate_pct,avg_latency_ms,p50_latency_ms,p90_latency_ms,avg_ttft_ms,avg_output_tokens,throughput_req_s,labels,wall_time_s,server_parallel,workers,prompt_id
-g3_p1,20,20,100.0,3910.0,3948.0,4673.0,538.0,111.0,0.26,"{""positive"": 3, ""neutral"": 14, ""negative"": 3}",78.2,1,1,A0
-g3_p4,20,20,100.0,10706.0,10281.0,14918.0,935.0,111.0,0.09,"{""positive"": 3, ""neutral"": 13, ""negative"": 4}",214.1,4,4,A0
-g3_p6,20,20,100.0,13711.0,13801.0,17332.0,1209.0,104.0,0.07,"{""positive"": 4, ""neutral"": 13, ""negative"": 3}",274.2,6,6,A0

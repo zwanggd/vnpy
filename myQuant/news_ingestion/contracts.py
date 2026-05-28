@@ -160,6 +160,8 @@ class StockProfile:
     downstream: tuple[str, ...] = ()
     macro_factors: tuple[str, ...] = ()
     risk_keywords: tuple[str, ...] = ()
+    company_archetype: str = "generic"
+    company_archetype_version: str = "company_archetype_v0.1"
     profile_version: str = "agent_news_v0.1"
     updated_at: datetime | None = None
     symbol: str = ""
