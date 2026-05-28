@@ -225,6 +225,9 @@ AGENT_NEWS_LIVE_TEST=1 pytest myQuant/news_ingestion/tests/test_live_sources.py 
 - `myQuant/` — 我们的代码。
 - `.sisyphus/plans/` — 实施计划，实施前先看。
 
+### Directory Discipline
+- **禁止**在项目根目录下未经允许创建新目录。所有新文件放入已有目录结构（`myQuant/`、`strategies/`、`backtests/`、`scripts/`、`docs/`、`examples/`、`.sisyphus/`），或事先征得用户同意。
+
 ### Agent Delegation
 - 多步骤任务 → 先写计划（`.sisyphus/plans/`），再委托。
 - 探索类 → `explore`/`librarian` agent，后台并行。
